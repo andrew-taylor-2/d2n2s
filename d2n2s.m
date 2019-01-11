@@ -1,4 +1,5 @@
 function dwi=d2n2s(dcm2niixd_folder,flags)
+%radical change loll
 % operates on files/folders
 %
 %flags.pick - if this is specified, this nii filename will be chosen to have it's
