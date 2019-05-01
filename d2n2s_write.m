@@ -11,6 +11,13 @@ function d2n2s_write(dwi,folder,name,flags)
 %if you wanted to use this on only one field, you could make another object
 %with just the field. or use a segment of the object
 
+if ~exist(folder,'dir')
+    try
+        mkdir(folder)
+    catch
+    end
+end
+
 if isfield(dwi,'bval')
     bvalw=[dwi(:).bval];
     fn=fullfile(folder,[name '.bval']);
@@ -79,4 +86,13 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
         end
     end
 end
+if isfield(dwi,'json') 
+    try; if numel(dwi)>1 && ~isequal(dwi.json)
+        warning('Not every json in the dataset to be written is equal to one another. Writing only the first element''s .json field')
+    end; catch; end
+    jsontext=jsonencode(dwi(1).json);
+    fn=fullfile(folder,[name '.json']);
+    fid=fopen(fn,'w');
+    fprintf(fid,'%s',jsontext);
+    fclose(fid);
 end

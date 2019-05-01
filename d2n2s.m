@@ -67,7 +67,6 @@ if ~isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1)
     else 
         error('none of your bvec matrix dimensions are 3, unable to parse')
     end
-    %this doesn't generally work for 3x3 bvecs
     [dwi(1:length(bvecs2)).bvec]=bvecs2{:};     
 end
 
