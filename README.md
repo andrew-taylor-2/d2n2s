@@ -1,6 +1,6 @@
 
-#D2N2S 
-##stands for Dicom to Nifti to Struct
+# D2N2S 
+## stands for Dicom to Nifti to Struct
   
 The functions in this repository are intended to make preprocessing faster and prettier and less prone to user error.  
 
