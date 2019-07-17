@@ -124,7 +124,7 @@ end
 
 %some b0 series do not have bvals or bvecs -- for very specific cases,
 %include these
-if ~isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && ~isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1) && contains(dcm2niixd_folder,'b0','IgnoreCase',1)
+if isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1) && contains(dcm2niixd_folder,'b0','IgnoreCase',1)
     [dwi.bvec]=deal([0;0;0]);
     [dwi.bval]=deal(0);
     warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
