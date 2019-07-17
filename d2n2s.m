@@ -70,23 +70,24 @@ if ~isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1)
     [dwi(1:length(bvecs2)).bvec]=bvecs2{:};     
 end
 
-if ~isfield(flags,'pick') || isempty(flags.pick) || isempty(dir(flags.pick)) %if the user has not opted to specify the nii fn himself
+if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %if the user has not opted to specify the nii fn himself
     dnii=dir([dcm2niixd_folder filesep '*.nii']);
     
-    %sanitize input:remove 'res.nii' and 'noise.nii'
-    %these are common ancillary image names in our pipeline
-    problem_index=[];
-    problem_index2=[];
-    for j=1:length(dnii)
-        if strcmpi(dnii(j).name,'res.nii')
-            problem_index=[problem_index j];
-        end
-        if strcmpi(dnii(j).name,'noise.nii')
-            problem_index2=[problem_index2 j];
-        end
-    end
-    problem_indices=union(problem_index,problem_index2);
-    dnii(problem_indices)=[];
+    %this could be confusing to the user, phasing this bit out
+%     %sanitize input:remove 'res.nii' and 'noise.nii'
+%     %these are common ancillary image names in our pipeline
+%     problem_index=[];
+%     problem_index2=[];
+%     for j=1:length(dnii)
+%         if strcmpi(dnii(j).name,'res.nii')
+%             problem_index=[problem_index j];
+%         end
+%         if strcmpi(dnii(j).name,'noise.nii')
+%             problem_index2=[problem_index2 j];
+%         end
+%     end
+%     problem_indices=union(problem_index,problem_index2);
+%     dnii(problem_indices)=[];
     
 elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~isempty(dir(flags.pick))
     dnii=dir(flags.pick);
@@ -120,6 +121,17 @@ if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1) && ~contains(flags
         dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
     end
 end
+
+%some b0 series do not have bvals or bvecs -- for very specific cases,
+%include these
+if ~isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && ~isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1) && contains(dcm2niixd_folder,'b0','IgnoreCase',1)
+    [dwi.bvec]=deal([0;0;0]);
+    [dwi.bval]=deal(0);
+    warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
+end
+
+
+
 if ~isempty(djson) && ~contains(flags.no,'json','IgnoreCase',1)
     jsfn=[djson.folder filesep djson.name];
     jsvals=readJson(jsfn);
