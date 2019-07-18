@@ -25,9 +25,12 @@ end
 
 %find files
 dbvec=dir([dcm2niixd_folder filesep '*.bvec']);
+dbvec2=dir([dcm2niixd_folder filesep '*.bvecs']);
+dbvec=[dbvec;dbvec2]; %just in case
 dbval=dir([dcm2niixd_folder filesep '*.bval']);
-%dnii=dir([dcm2niixd_folder filesep '*.nii']);
-%dnii gets set later and is part of a conditional
+dbval2=dir([dcm2niixd_folder filesep '*.bvals']);
+dbval=[dbval;dbval2]; %just in case
+%dnii=dir([dcm2niixd_folder filesep '*.nii']); %dnii gets set later and is part of a conditional
 djson=dir([dcm2niixd_folder filesep '*.json']);
 
 %warnings
@@ -124,12 +127,15 @@ end
 
 %some b0 series do not have bvals or bvecs -- for very specific cases,
 %include these
-if isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1) && contains(dcm2niixd_folder,'b0','IgnoreCase',1)
+if isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1)
     [dwi.bvec]=deal([0;0;0]);
     [dwi.bval]=deal(0);
-    warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
+    if contains(dcm2niixd_folder,'b0','IgnoreCase',1)
+        warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
+    else
+        warning('there are no bvals or bvecs\nALSO the folder you have supplied doesn''t have ''b0'' in the name. \nStill, setting bvals and bvecs to 0 as a best guess.')
+    end
 end
-
 
 
 if ~isempty(djson) && ~contains(flags.no,'json','IgnoreCase',1)

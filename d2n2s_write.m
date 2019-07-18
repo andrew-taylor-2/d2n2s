@@ -20,6 +20,9 @@ end
 
 if isfield(dwi,'bval')
     bvalw=[dwi(:).bval];
+    if numel(bvalw)<numel(dwi);
+        warning('you might have some empty bvals; proceeding anyway')
+    end
     fn=fullfile(folder,[name '.bval']);
     fid=fopen(fn,'w');
     fprintf(fid,'%u ',bvalw);
@@ -28,6 +31,9 @@ end
 
 if isfield(dwi,'bvec')
     bvecs=[dwi(:).bvec];
+    if length(bvecs)<numel(dwi)
+        warning('some of your bvecs might be empty; proceeding anyway')
+    end
     fn=fullfile(folder,[name '.bvec']);
     if ~isfield(flags,'gr') || isempty(flags.gr)
         flags.gr=1;
