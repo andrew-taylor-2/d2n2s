@@ -23,6 +23,11 @@ if ~isfield(flags,'no') || isempty(flags.no)
     flags.no='';
 end
 
+if ~isfield(flags,'b0') || isempty(flags.b0) 
+    flags.b0=1;
+end
+
+
 %find files
 dbvec=dir([dcm2niixd_folder filesep '*.bvec']);
 dbvec2=dir([dcm2niixd_folder filesep '*.bvecs']);
@@ -127,7 +132,7 @@ end
 
 %some b0 series do not have bvals or bvecs -- for very specific cases,
 %include these
-if isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1)
+if isempty(dbvec) && ~contains(flags.no,'bvec','IgnoreCase',1) && isempty(dbval) && ~contains(flags.no,'bval','IgnoreCase',1) && ~isequal(flags.b0,0)
     [dwi.bvec]=deal([0;0;0]);
     [dwi.bval]=deal(0);
     if contains(dcm2niixd_folder,'b0','IgnoreCase',1)
