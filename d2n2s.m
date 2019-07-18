@@ -101,7 +101,7 @@ elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~isempty(dir(flags.pick)
     dnii=dir(flags.pick);
 end
 
-if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1) && ~contains(flags.no,'img','IgnoreCase',1)
+if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1)
     hdr=spm_vol([dnii.folder filesep dnii.name]);
     if exist('dwi','var')
         if length(hdr)~=length(dwi)
@@ -119,9 +119,11 @@ if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1) && ~contains(flags
     end
     [dwi(1:length(hdr2)).hdr]=hdr2{:};
     
-    img=spm_read_vols(hdr);
-    img2=num2cell(img,[1 2 3]);
-    [dwi.img]=img2{:};
+    if ~contains(flags.no,'img','IgnoreCase',1)
+        img=spm_read_vols(hdr);
+        img2=num2cell(img,[1 2 3]);
+        [dwi.img]=img2{:};
+    end
     
     v0=spm_file_split2([dnii.folder filesep dnii.name]);
     for i=1:size(v0,1)
