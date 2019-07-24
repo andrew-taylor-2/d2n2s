@@ -1,5 +1,5 @@
 function dwi=d2n2s(dcm2niixd_folder,flags)
-
+%radical change loll
 % operates on files/folders
 %
 %flags.pick - if this is specified, this nii filename will be chosen to have it's
@@ -23,8 +23,8 @@ if ~isfield(flags,'no') || isempty(flags.no)
     flags.no='';
 end
 
-if ~isfield(flags,'b0') || isempty(flags.b0) 
-    flags.b0=1;
+if ~isfield(flags,'') || isempty(flags.no) 
+    flags.no='';
 end
 
 
@@ -101,7 +101,7 @@ elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~isempty(dir(flags.pick)
     dnii=dir(flags.pick);
 end
 
-if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1)
+if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1) && ~contains(flags.no,'img','IgnoreCase',1)
     hdr=spm_vol([dnii.folder filesep dnii.name]);
     if exist('dwi','var')
         if length(hdr)~=length(dwi)
@@ -119,11 +119,9 @@ if ~isempty(dnii) && ~contains(flags.no,'nii','IgnoreCase',1)
     end
     [dwi(1:length(hdr2)).hdr]=hdr2{:};
     
-    if ~contains(flags.no,'img','IgnoreCase',1)
-        img=spm_read_vols(hdr);
-        img2=num2cell(img,[1 2 3]);
-        [dwi.img]=img2{:};
-    end
+    img=spm_read_vols(hdr);
+    img2=num2cell(img,[1 2 3]);
+    [dwi.img]=img2{:};
     
     v0=spm_file_split2([dnii.folder filesep dnii.name]);
     for i=1:size(v0,1)
