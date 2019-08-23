@@ -18,7 +18,7 @@ if ~exist(folder,'dir')
     end
 end
 
-if isfield(dwi,'bval')
+if isfield(dwi,'bval') && ~isempty([dwi.bval])
     bvalw=[dwi(:).bval];
     if numel(bvalw)<numel(dwi);
         warning('you might have some empty bvals; proceeding anyway')
@@ -29,7 +29,7 @@ if isfield(dwi,'bval')
     fclose(fid);
 end
 
-if isfield(dwi,'bvec')
+if isfield(dwi,'bvec') && ~isempty([dwi.bvec])
     bvecs=[dwi(:).bvec];
     if length(bvecs)<numel(dwi)
         warning('some of your bvecs might be empty; proceeding anyway')
@@ -92,7 +92,7 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
         end
     end
 end
-if isfield(dwi,'json') 
+if isfield(dwi,'json') && ~isempty([dwi.json])
     try; if numel(dwi)>1 && ~isequal(dwi.json)
         warning('Not every json in the dataset to be written is equal to one another. Writing only the first element''s .json field')
     end; catch; end
