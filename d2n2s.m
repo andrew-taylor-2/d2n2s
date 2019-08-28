@@ -116,6 +116,13 @@ end
 % get nifti name with dir or flags.pick
 if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %if the user has not opted to specify the nii fn himself
     dnii=dir([dcm2niixd_folder filesep '*.nii']);
+    
+    if isempty(dnii)
+        dnii=dir([dcm2niixd_folder filesep '*.nii.gz']);
+        warning('couldn''t find a .nii file, but found a .nii.gz -- using')
+    end
+    
+    
 elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~isempty(dir(flags.pick)) % if the user HAS specified the nii fn himself
     dnii=dir(flags.pick);
 end
@@ -140,12 +147,6 @@ if ~isempty(dnii)
             end
         end
         
-        if length(dnii)>1
-            warning('found more than one nii file. using the ''first''.')
-            dnii=dnii(1);
-        end
-        % end sanitize
-        
         %prep to assign header
         hdr2=cell(1,length(hdr));
         for i=1:length(hdr)
@@ -167,7 +168,7 @@ if ~isempty(dnii)
         end
         
         %this function is kind of obsolete
-        v0=spm_file_split2([dnii.folder filesep dnii.name]);
+        v0=spm_file_split2(nii_file);
         for i=1:size(v0,1)
             dwi(i).fn=v0(i,:);
             
@@ -178,7 +179,7 @@ if ~isempty(dnii)
             % anyway. If anyone is curiously reading this, ask me and I'll
             % tell you about it to the best of my understanding
             
-            dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
+%             dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
         end
     end
 end

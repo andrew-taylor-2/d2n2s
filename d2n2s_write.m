@@ -11,6 +11,10 @@ function d2n2s_write(dwi,folder,name,flags)
 %if you wanted to use this on only one field, you could make another object
 %with just the field. or use a segment of the object
 
+% note: this is an SPM issue, but if you try to write to a folder and use
+% the home folder '~' notation, e.g. folder='~/re/test'; spm is going to
+% fail. just replace '~' with your home directory
+
 if ~exist(folder,'dir')
     try
         mkdir(folder)
