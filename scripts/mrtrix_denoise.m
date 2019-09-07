@@ -4,8 +4,6 @@ function varargout=mrtrix_denoise(fn_4d,suffix,shell,exe)
 % This function is included for ease of use on windows -- dwidenoise is much
 % more straightforward to use on unix-like systems. Just use command line for these cases
 
-    
-
 %convert strings to char just in case
 if isstring(fn_4d)
     fn_4d=char(fn_4d);
@@ -13,15 +11,44 @@ end
 if isstring(suffix)
     suffix=char(suffix);
 end
+
+%this only works on 4d volumes, so:
+assert(numel(spm_vol(fn_4d))>1,'only works on 4d niis');
+
+%% do the simple case if shell,exe not defined
+%note: I wrote this in vim and not my normal matlab environment, so be wary of things like unclosed quotes etc
+if ~exists('shell','var') && ~exists('exe','var') 
+    warning('no shell or exe given -- assuming you''re on a mac or unix and you''ve got mrtrix set up for command line')
+    [a1,b1,c1]=fileparts(fn_4d);
+    [a2,b2,c2]=fileparts(exe); 
+
+    %commands
+    command1=['dwidenoise "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,'noise.'...
+    'nii') '" -force'];
+    [status{1},cmdout{1}] = system(command1);
+
+    command2= ['mrcalc "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -subtract'...
+    ' "' fullfile(a1,'res.nii') '" -force'];
+    [status{2},cmdout{2}] = system(command2);
+
+    %handle outs -- wrote this a while ago, might not be necessary now
+    if nargout==2
+        varargout{1}=status;
+        varargout{2}=cmdout;
+    elseif nargout==1
+        varargout{1}=cmdout;
+    end
+    %that's all folks!
+    return
+end
+%convert strings to char just in case
+
 if isstring(shell)
     shell=char(shell);
 end
 if isstring(exe)
     exe=char(exe);
 end
-
-%this only works on 4d volumes, so:
-spm_vol(fn_4d);
 
 %find out if the user has given you the path to dwidenoise or to the bin
 %folder
