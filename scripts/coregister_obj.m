@@ -30,7 +30,12 @@ for i=1:length(source_obj_seg)
     source_obj_seg(i).hdr.img=source_obj_seg(i).img;
 end
 
-x  = spm_coreg_at(target_object_seg.hdr, source_obj_seg(1).hdr, estflg); 
+
+if ~isfield(flags,'no0') || isequal(flags.no0,0)
+    x  = spm_coreg_at(target_object_seg.hdr, source_obj_seg(1).hdr, estflg); 
+else 
+    x  = spm_coreg_at_no0(target_object_seg.hdr, source_obj_seg(1).hdr, estflg);
+end
 
 %unset .hdr.img for clarity 
 target_object_seg.hdr=rmfield(target_object_seg.hdr,'img');
@@ -65,13 +70,11 @@ end
 
 %implicit if: other options have bailed at this point
 %if ~isfield(flags,'apply') || isequal(flags.apply,2)
+
 %reslice
 big_obj=join_obj(target_object_seg,source_obj_seg);
-if ~isfield(flags,'no0') || isequal(flags.no0,0)
-    big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
-else %if the user doesn't want to consider voxel values of src or trg near 0
-    big_obj=spm_reslice_at_no0(big_obj,wrtflg)
-end
+big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
+big_obj=spm_reslice_at_no0(big_obj,wrtflg)
 new_source=big_obj(2:end);
 %end
 end
