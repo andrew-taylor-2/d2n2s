@@ -1,6 +1,13 @@
-function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg)
+function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 %target object seg should be a dwi object with one element
 % operates on "objects" (structures)
+
+%flags: no0: if 1 (0 default), chooses to use a modified spm_coreg that doesn''t consider voxels in first bin of 256 (closest to 0) in joint histogram similarity metric, ie voxels with very low intensity in either source or target will not contribute towards similarity metric (NMI) and therefore registration.
+
+%     : animal: if 1 (0 default), x10 scaled down parameters will be used for spm_coreg. This is very important if your voxel sizes are small (e.g. closer to .1x.1.x.1 than 1.5x1.5x1.5).
+
+%     : apply: if 2 (default), affine registration will be estimated and image will be resliced thusly. If 1, reg will be estimated and the orientation matrix will be updated to reflect the change of origin. If 0, "new_source" will be equal to source_obj_seg and M will be the estimated rigid body reg.
+
 if length(target_object_seg)>1; error('unintended usage');end
 
 % coregistration and reslicing parameters
@@ -11,6 +18,12 @@ estflg.fwhm     = [7 7];
 wrtflg        = spm_get_defaults('realign.write');
 wrtflg.interp   = 1;
 wrtflg.which    = [1 0];
+
+if isfield(flags,'animal') && isequal(1,flags.animal)
+    estflg.sep=estflg.sep*0.1;
+    estflg.fwhm=estflg.fwhm*0.1;
+end
+	
 
 target_object_seg.hdr.img=target_object_seg.img;
 for i=1:length(source_obj_seg)
