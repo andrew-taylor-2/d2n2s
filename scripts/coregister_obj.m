@@ -40,20 +40,38 @@ end
 
 
 M  = inv(spm_matrix(x));
-MM = zeros(4, 4, length(source_obj_seg));
 
-for j=1:length(source_obj_seg)
-    MM(:,:,j)=source_obj_seg(j).hdr.mat;
-end
-for j = 1:length(source_obj_seg)
-    source_obj_seg(j).hdr.mat=M*MM(:,:,j);
-    source_obj_seg(j).hdr.private.mat=source_obj_seg(j).hdr.mat;
-    source_obj_seg(j).hdr.private.mat0=source_obj_seg(j).hdr.mat;
+if ~isfield(flags,'apply') || flags.apply>0
+
+    MM = zeros(4, 4, length(source_obj_seg));
+
+    for j=1:length(source_obj_seg)
+        MM(:,:,j)=source_obj_seg(j).hdr.mat;
+    end
+    for j = 1:length(source_obj_seg)
+        source_obj_seg(j).hdr.mat=M*MM(:,:,j);
+        source_obj_seg(j).hdr.private.mat=source_obj_seg(j).hdr.mat;
+        source_obj_seg(j).hdr.private.mat0=source_obj_seg(j).hdr.mat;
+    end
+
+    if isequal(flags.apply,1) %if you only want hdr to change, bail out here
+        new_source=source_obj_seg;
+	return;
+    end	
+else %if flags.apply is 0, i.e. you just wanted to see what M was, leave source unchanged and bail out here
+    new_source=source_obj_seg;
+    return
 end
 
+%implicit if: other options have bailed at this point
+%if ~isfield(flags,'apply') || isequal(flags.apply,2)
+%reslice
 big_obj=join_obj(target_object_seg,source_obj_seg);
-big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
+if ~isfield(flags,'no0') || isequal(flags.no0,0)
+    big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
+else %if the user doesn't want to consider voxel values of src or trg near 0
+    big_obj=spm_reslice_at_no0(big_obj,wrtflg)
+end
 new_source=big_obj(2:end);
-
-
+%end
 end
