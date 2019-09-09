@@ -1,3 +1,0 @@
-[submodule "utilities/unring_lib"]
-	path = utilities/external/unring_lib
-	url = https://bitbucket.org/reisert/unring.git
