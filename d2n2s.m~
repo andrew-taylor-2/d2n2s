@@ -23,10 +23,6 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 
 %% random input sanitizing
 
-if ~exist('flags','var')
-    flags=[];
-end
-
 if isstring(dcm2niixd_folder)
     dcm2niixd_folder=char(dcm2niixd_folder);
 end
@@ -34,7 +30,6 @@ if isfield(flags,'pick') && ~isempty(flags.pick) && isstring(flags.pick)
     flags.pick=char(flags.pick);
 end
 
-%these next two have to be initialized 
 if ~isfield(flags,'no') || isempty(flags.no) 
     flags.no='';
 end
@@ -55,23 +50,22 @@ dbval=[dbval;dbval2]; %just in case
 %dnii=dir([dcm2niixd_folder filesep '*.nii']); %dnii gets set later and is part of a conditional
 djson=dir([dcm2niixd_folder filesep '*.json']);
 
-%if they've picked a file,
-if isfield(flags,'pick') && ~isempty(flags.pick) 
+if isfield(flags,'pick') && ~isempty(flags.pick) %if they've picked a file,
     %look for files with the same "name"
     [pp,nn,ee]=fileparts(flags.pick);
     
     matching_bvec_name=[pp filesep nn '.bvec'];
-    if exist(matching_bvec_name,'file')
+    if exists(matching_bvec_name)
         dbvec=dir(matching_bvec_name);
     end
        
     matching_bval_name=[pp filesep nn '.bval'];
-    if exist(matching_bval_name,'file')
+    if exists(matching_bval_name)
         dbval=dir(matching_bval_name);
     end
     
     matching_json_name=[pp filesep nn '.json'];
-    if exist(matching_json_name,'file')
+    if exists(matching_json_name)
         djson=dir(matching_json_name);
     end
     
@@ -205,9 +199,7 @@ if ~isempty(dnii)
         v0=spm_file_split2(nii_file);
         for i=1:size(v0,1)
             dwi(i).fn=v0(i,:);
-
             
-            % old comment:
             % I don't remember exactly how the line below works anymore.
             % I'm keeping it just because it didn't hurt anything and I've
             % really thoroughly tested this function at this point...
@@ -215,15 +207,7 @@ if ~isempty(dnii)
             % anyway. If anyone is curiously reading this, ask me and I'll
             % tell you about it to the best of my understanding
             
-            % new comment:
-            % it was actually important somehow. I commented it, and later
-            % on, when I tried to concatenate spm_vol objects which
-            % previously had different datatypes and write, it messed up
-            % and wrote noise. I'm still not sure exactly why this is, but
-            % I've checked that this is functioning well empirically and it
-            % is so.... it stays.
-            
-            dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
+%             dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
         end
     end
 end

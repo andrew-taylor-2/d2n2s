@@ -1,4 +1,4 @@
-function topup_n_eddy(dwi_dir,topup_dir,outdir,pick)
+function [out_fn,mask_fn,bvals_fn]=topup_n_eddy(dwi_dir,topup_dir,outdir,pick)
 % use d2n2s to run eddy from 2 dwi objects
 % this assumes you have dwis in a folder and topup b0s acquired differently
 % in another folder
@@ -6,34 +6,13 @@ function topup_n_eddy(dwi_dir,topup_dir,outdir,pick)
 %notes: this function will not work if you have spaces in your pathname
 
 %% handle variable input conditions
-% THIS SECTION UNDER CONSTRUCTION
+
 %make output dir if it doesn't exist
 if ~exist(outdir,'dir')
     mkdir(outdir)
 end
-% 
-% %if something's a nii.gz, convert (to a unique name)
-% %check and see if there's .niis in the folders
-% originaldir{1}=dwi_dir; %this is used if conversion is needed -- this way of doing it will work for symbolic linked paths
-% originaldir{2}=topup_dir;
-% checkniis{1}=dir([dwi_dir filesep '*.nii']);
-% checkniis{2}=dir([topup_dir filesep '*.nii']);
-% checkniigzs{1}=dir([dwi_dir filesep '*.nii.gz']);
-% checkniigzs{2}=dir([topup_dir filesep '*.nii.gz']);
-% 
-% for i=1:2
-%     if isempty(checkniis{i}) && isempty(checkniigzs{i})
-%         error('images missing -- no .nii or .nii.gz files found for input dir(s)')
-%     elseif isempty(checkniis{i}) && ~isempty(checkniigzs{i})
-%         if length(checkniigzs{i})>1
-%             error('not sure which gz to convert')
-%         end
-%         gunzip([originaldir{i} filesep checkniigzs{i}.name],);
-%         
 
-% if a pick flag exists, use this to choose niftis inputs in a folder with
-% multiple niftis
-
+%% if a pick flag exists, use this to choose niftis inputs in a folder with multiple niftis
 
 %assign to flags for reading
 dflags.pick=[];
@@ -211,4 +190,78 @@ fprintf(fidd,'%i\n',index_array1');
 fclose(fidd);
 
 end
+
 end
+
+function ensure_bvecs_are_fsl_convention(bvecs_fn)
+try
+    bvecs=load(bvecs_fn);
+    if size(bvecs,2)==3 && size(bvecs,1)~=3 %if they're cbi convention && not ambiguous
+        bvecs2=num2cell(bvecs',1); 
+    elseif size(bvecs,1)==3 && size(bvecs,2)~=3 %if they're fsl/dcm2niix convention && not ambiguous
+%         bvecs2=num2cell(bvecs,1);
+        return
+    elseif size(bvecs,1)==3 && size(bvecs,2)==3 %if they're ambiguous
+%         bvecs2=num2cell(bvecs,1);
+%         warning('your bvecs are square, so the orientation convention is ambiguous to this function. assuming they are in fsl/dcm2niix convention. user may need to transpose.')
+        return
+    else 
+        error('none of your bvec matrix dimensions are 3, unable to parse')
+    end
+    good_looking_bvecs=cat(2,bvecs2{:});
+    dlmwrite(bvecs_fn,good_looking_bvecs,' ')
+catch 
+    warning('couldn''t ensure bvecs are fsl convention')
+end
+end
+
+%% begin external code from Chris Rorden's nii_preprocess
+function isHalfSphere = HalfSphere(bvec_nam)
+%return true if DWI vectors sample half sphere
+% bvec_nam : filename of b-vector file
+%Example
+% HalfSphere('dki.bvec')
+% if ~exist('bvec_nam','var') %file not specified
+%    fprintf('Select b-vec file\n');
+%    [A,Apth] = uigetfile({'*.bvec'},'Select b-vec file');
+%    if isnumeric(A), return; end; %nothing selected
+%    bvec_nam = strcat(Apth,char(A));
+% end;
+% %handle different extensions bvec/nii/nii.gz
+[p,n,x]=fileparts(bvec_nam);
+if ~strcmpi(x,'.bvec')
+    fnm = fullfile(p,[n,'.bvec']);
+    if ~exist(fnm,'file') %assume img.nii.gz
+        [~,n,x] = fileparts(n);
+        fnm = fullfile(p,[n,'.bvec']);
+    end
+    if ~exist(fnm,'file')
+        error('Unable to find bvec file for %s', vNam);
+    end
+    bvec_nam = fnm;
+end
+isHalfSphere = false;
+bvecs = load(bvec_nam); 
+bvecs = unitLengthSub(bvecs)';
+bvecs(~any(~isnan(bvecs')),:) = [];
+if isempty(bvecs), return; end;
+mn = unitLengthSub(mean(bvecs)')';
+if isnan(mn), return; end;
+mn = repmat(mn,size(bvecs,1),1);
+minV = min(dot(bvecs',mn'));
+thetaInDegrees = acosd(minV);
+if thetaInDegrees < 110
+    isHalfSphere = true;
+    fprintf('Sampling appears to be half sphere (%g-degrees): %s\n', thetaInDegrees, bvec_nam);
+end;
+end
+
+function Xu = unitLengthSub(X) 
+%Use pythagorean theorem to set all vectors to have length 1
+%does not require statistical toolbox 
+if size(X,1) ~= 3, error('expected each column to have three rows (X,Y,Z coordinates)'); end;
+Dx =  sqrt(sum((X.^2)));
+Dx = [Dx; Dx; Dx];
+Xu = X./Dx;
+end 
+%% end external code
