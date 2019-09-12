@@ -1,4 +1,10 @@
 function [Y,XYZmm] = at_read_vols(V2,mask)
+%NOTE: this function is obsolete for it's former primary function, reading
+%volumes. No differences exist between Y and V2.img for the usage
+%"Y=at_read_vols(V2)". This could be used, however, for it's NaN handling,
+%for warning about differences in dimension or orientation between input
+%images through spm_check_orientation, or for use computing XYZmm
+
 % Read in entire image volumes
 % operates on "objects" (structures)
 % FORMAT [Y,XYZmm] = spm_read_vols(V,mask)

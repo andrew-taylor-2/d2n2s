@@ -135,7 +135,7 @@ if ~isempty(dbvec)
             bvecs2=num2cell(bvecs,1);
         elseif size(bvecs,1)==3 && size(bvecs,2)==3 %if they're ambiguous
             bvecs2=num2cell(bvecs,1);
-            warning('your bvecs are square, so the orientation convention is ambiguous to this function. assuming they are in fsl/dcm2niix convention. user may need to transpose.')
+            warning(['your bvecs are square, so the orientation convention is ambiguous to this function. ' newline 'assuming they are in fsl/dcm2niix convention. user may need to transpose.'])
         else
             error('none of your bvec matrix dimensions are 3, unable to parse')
         end
@@ -177,7 +177,7 @@ if ~isempty(dnii)
         % sanitize
         if exist('dwi','var')
             if length(hdr)~=length(dwi)
-                warning('spm_vol thinks your 4D volume has a different number of images from your bvals file. this function might not behave as intended')
+                warning(['spm_vol thinks your 4D volume has a different number of images from your bvals and/or bvecs file.' newline 'this function might not behave as intended'])
             end
         end
         
@@ -335,7 +335,7 @@ if ~isequal(flags.b0,0) && exist('dwi','var') && isempty(dbvec) && isempty(dbval
     if contains(dcm2niixd_folder,'b0','IgnoreCase',1)
         warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
     else
-        warning('there are no bvals or bvecs\nALSO the folder you have supplied doesn''t have ''b0'' in the name. \nStill, setting bvals and bvecs to 0 as a best guess.')
+        warning(['there are no bvals or bvecs' newline 'ALSO the folder you have supplied doesn''t have ''b0'' in the name.' newline 'Still, setting bvals and bvecs to 0 as a best guess.'])
     end
 end
 
