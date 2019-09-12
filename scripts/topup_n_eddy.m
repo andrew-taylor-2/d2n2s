@@ -85,15 +85,17 @@ topup_b0s_fn=[topup_interm_dir filesep 'all_b0s.nii']; %d2n2s_write makes this f
 
 %% get bvec, bval, nii files for main 4d image
 %pretty sure no other bvec,bval files have been written to this main folder
-bvecs=dir([dwi_dir filesep '*.bvec']);
-bvecs_fn=[dwi_dir filesep bvecs.name];%hope dir only grabbed one file
+% bvecs=dir([dwi_dir filesep '*.bvec']);
+% bvecs_fn=[dwi_dir filesep bvecs.name];%hope dir only grabbed one file
+bvecs_fn=dwis(1).fns.bvec;
 
-bvals=dir([dwi_dir filesep '*.bval']);
-bvals_fn=[dwi_dir filesep bvals.name]; %only one plz
+% bvals=dir([dwi_dir filesep '*.bval']);
+% bvals_fn=[dwi_dir filesep bvals.name]; %only one plz
+bvals_fn=dwis(1).fns.bval;
 
-dwi_image_dir=dir([dwi_dir filesep '*.nii']);
-dwi_image_fn=[dwi_dir filesep dwi_image_dir.name]; %only one plz
-
+% dwi_image_dir=dir([dwi_dir filesep '*.nii']);
+% dwi_image_fn=[dwi_dir filesep dwi_image_dir.name]; %only one plz
+dwi_image_fn=dwis(1).fns.nii;
 
 %% run the FSL commands!
 eddy_dir=[outdir filesep 'eddy'];
@@ -105,11 +107,13 @@ command=['topup --imain=' topup_b0s_fn ' --datain=' acqp_fn ' ' ...
     '--config=b02b0.cnf --out=' topup_interm_dir filesep 'my_topup_results ' ...
     '--fout=' topup_interm_dir filesep 'my_field --iout=' topup_interm_dir filesep ...
     'my_unwarped_images'];
+disp(command)
 system(command)
 
 command=['eddy --imain=' dwi_image_fn '  --mask=' mask_fn ' --index=' index_fn ...
     ' --acqp=' acqp_fn ' --bvecs=' bvecs_fn ' --bvals=' bvals_fn ' --out=' ...
     out_fn ' --topup=' topup_interm_dir filesep 'my_topup_results --repol --data_is_shelled'];
+disp(command)
 system(command)
 
 
