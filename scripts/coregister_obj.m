@@ -76,9 +76,8 @@ end
 %if ~isfield(flags,'apply') || isequal(flags.apply,2)
 
 %reslice
-big_obj=join_obj(target_object_seg,source_obj_seg);
+big_obj=join_obj(target_object_seg,source_obj_seg); %this is how spm wants em
 big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
-big_obj=spm_reslice_at_no0(big_obj,wrtflg);
 new_source=big_obj(2:end);
 %end
 end
