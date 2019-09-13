@@ -70,10 +70,10 @@ end
 %in all previous tests, using at_read_vols() is the same as just
 %using the .img data, but we're doing this just to be safe
 b0i=find([rdkis.bval]==0);
-b0s=at_read_vols(rdkis(b0i));
+b0s=cat(4,rdkis(b0i).img);
 
 b0i2=find([fbis.bval]==0);
-b0s2=at_read_vols(fbis(b0i2));
+b0s2=cat(4,fbis(b0i2));
 
 allb0s=cat(4,b0s,b0s2);
 
