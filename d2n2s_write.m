@@ -170,15 +170,17 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
 end
 
 %% json file
-empty_jsons=arrayfun(@(x) isempty(x.json),dwi);
-nonempty_jsons_inds=find(~empty_jsons);
-if isfield(dwi,'json') && ~all(empty_jsons)
-    try; if numel(dwi)>1 && ~isequal(dwi.json)
-        warning('Not every json in the dataset to be written is equal to one another. Writing only the first nonzero json element''s .json field')
-    end; catch; end
-    jsontext=jsonencode(dwi(nonempty_jsons_inds(1)).json);
-    fn=fullfile(folder,[name '.json']);
-    fid=fopen(fn,'w');
-    fprintf(fid,'%s',jsontext);
-    fclose(fid);
+if isfield(dwi,'json')
+    empty_jsons=arrayfun(@(x) isempty(x.json),dwi);
+    nonempty_jsons_inds=find(~empty_jsons);
+    if ~all(empty_jsons)
+        try; if numel(dwi)>1 && ~isequal(dwi.json)
+                warning('Not every json in the dataset to be written is equal to one another. Writing only the first nonzero json element''s .json field')
+            end; catch; end
+        jsontext=jsonencode(dwi(nonempty_jsons_inds(1)).json);
+        fn=fullfile(folder,[name '.json']);
+        fid=fopen(fn,'w');
+        fprintf(fid,'%s',jsontext);
+        fclose(fid);
+    end
 end

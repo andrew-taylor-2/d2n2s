@@ -1,4 +1,4 @@
-function [new_source,shift]=align_tool(target_object_seg,source_obj_seg,use_CoM)
+function [new_source,shift,trg_CoM]=align_tool(target_object_seg,source_object_seg,use_CoM)
 %BIG NOTE: RIGHT NOW, THIS IS ONLY INTENDED TO BE USED ON images with the
 %same dimensions (eg two instances of the same sequence)
 
@@ -6,7 +6,7 @@ function [new_source,shift]=align_tool(target_object_seg,source_obj_seg,use_CoM)
 if length(target_object_seg)>1; error('unintended usage');end
 
 %ensure correct usage
-assert(all(target_object_seg.hdr.dim == source_obj_seg(1).hdr.dim))
+assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
 
 
 %% move to align CoM if user has specified so
@@ -22,18 +22,22 @@ if use_CoM
 end
 
 trg_space=target_object_seg.hdr.mat;
-for j = 1:length(source_obj_seg)
+for j = 1:length(source_object_seg)
     %next line causes (in spm_reslice) source voxels to shift, then source
     %hdr.mat to be set to target
-    source_obj_seg(j).hdr.mat=trg_space*shift;
+    source_object_seg(j).hdr.mat=trg_space*shift;
     
     %set the others to the same
-    source_obj_seg(j).hdr.private.mat=source_obj_seg(j).hdr.mat;
-    source_obj_seg(j).hdr.private.mat0=source_obj_seg(j).hdr.mat;
+    source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
+    source_object_seg(j).hdr.private.mat0=source_object_seg(j).hdr.mat;
 end
 
-big_obj=join_obj(target_object_seg,source_obj_seg);
+big_obj=join_obj(target_object_seg,source_object_seg);
 if use_CoM % you don't need to reslice if you're not moving anything
+    wrtflg        = spm_get_defaults('realign.write');
+    wrtflg.interp   = 1;
+    wrtflg.which    = [1 0];
+
     big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
 end
 new_source=big_obj(2:end);

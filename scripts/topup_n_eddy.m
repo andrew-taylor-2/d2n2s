@@ -220,6 +220,9 @@ end
 end
 
 %% begin external code from Chris Rorden's nii_preprocess
+%this is unused as of now, but sometimes half sphere bvec acquisitions
+%benefit greatly from using the --slm=linear option in eddy
+
 function isHalfSphere = HalfSphere(bvec_nam)
 %return true if DWI vectors sample half sphere
 % bvec_nam : filename of b-vector file

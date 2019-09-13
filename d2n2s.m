@@ -30,6 +30,10 @@ end
 if isstring(dcm2niixd_folder)
     dcm2niixd_folder=char(dcm2niixd_folder);
 end
+if strcmp(dcm2niixd_folder(end),filesep)
+    dcm2niixd_folder=dcm2niixd_folder(1:end-1); %this isn't actually necessary since dir will ignore double separators, but I'm doing this for clarity
+end
+
 if isfield(flags,'pick') && ~isempty(flags.pick) && isstring(flags.pick)
     flags.pick=char(flags.pick);
 end
@@ -153,7 +157,9 @@ if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %i
     
     if isempty(dnii)
         dnii=dir([dcm2niixd_folder filesep '*.nii.gz']);
-        warning('couldn''t find a .nii file, but found a .nii.gz -- using')
+        if ~isempty(dnii)
+            warning('couldn''t find a .nii file, but found a .nii.gz -- using')
+        end
     end
     
     

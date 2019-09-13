@@ -46,7 +46,11 @@ end
 
 M  = inv(spm_matrix(x));
 
-if ~isfield(flags,'apply') || flags.apply>0
+if ~isfield(flags,'apply') 
+    flags.apply=2;
+end
+
+if flags.apply>0
 
     MM = zeros(4, 4, length(source_obj_seg));
 
@@ -74,7 +78,7 @@ end
 %reslice
 big_obj=join_obj(target_object_seg,source_obj_seg);
 big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
-big_obj=spm_reslice_at_no0(big_obj,wrtflg)
+big_obj=spm_reslice_at_no0(big_obj,wrtflg);
 new_source=big_obj(2:end);
 %end
 end
