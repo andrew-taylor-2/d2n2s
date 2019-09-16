@@ -13,6 +13,7 @@ if ~exist(outdir,'dir')
 end
 
 %% if a pick flag exists, use this to choose niftis inputs in a folder with multiple niftis
+%Would love to find a way to get rid of "pick..."
 
 %assign to flags for reading
 dflags.pick=[];
@@ -64,7 +65,7 @@ mkdir(topup_interm_dir)
 %% use the simple_acqp function to make index and acqp text files
 index_fn=[topup_interm_dir filesep 'index.txt'];
 acqp_fn=[topup_interm_dir filesep 'acqp.txt'];
-simple_acqp(dwis,topups,topup_interm_dir); %this command makes a two line acqp and a corresponding index file
+simple_acqp(dwis,topups,topup_interm_dir); %this command makes a two unique line acqp and a corresponding index file
 
 %% grab ALL the b0s for topup
 b0s_dwis=dwis(idx_b0s); %use idx from earlier
@@ -85,16 +86,10 @@ topup_b0s_fn=[topup_interm_dir filesep 'all_b0s.nii']; %d2n2s_write makes this f
 
 %% get bvec, bval, nii files for main 4d image
 %pretty sure no other bvec,bval files have been written to this main folder
-% bvecs=dir([dwi_dir filesep '*.bvec']);
-% bvecs_fn=[dwi_dir filesep bvecs.name];%hope dir only grabbed one file
+
+% get filenames from d2n2s struct
 bvecs_fn=dwis(1).fns.bvec;
-
-% bvals=dir([dwi_dir filesep '*.bval']);
-% bvals_fn=[dwi_dir filesep bvals.name]; %only one plz
 bvals_fn=dwis(1).fns.bval;
-
-% dwi_image_dir=dir([dwi_dir filesep '*.nii']);
-% dwi_image_fn=[dwi_dir filesep dwi_image_dir.name]; %only one plz
 dwi_image_fn=dwis(1).fns.nii;
 
 %% run the FSL commands!
@@ -135,9 +130,9 @@ else %assume they're all b0s
 end
 num_top_b0s=numel(idx_b0_topups);
 
-%% other stuff
-% j_struct{1}=readJson(json_fn); %json1);
-j_struct{1}=dwi_obj(1).json; %json1);
+%% parse json info, match to known PE dir strings
+% j_struct{1}=readJson(json_fn); 
+j_struct{1}=dwi_obj(1).json; 
 j_struct{2}=topup_obj(1).json;
 
 %see if you have the fields you need
@@ -166,8 +161,11 @@ for i=1:2
 end
 
 
+%% write .txt files 
 % there's one unique line for dwis and one for topups; this is going to
 % write them as many times as each set has b0s (bc that's what topup wants)
+
+% andrew sept, 2019: am I sure we need the unique lines to be repeated?
 fidd = fopen([out_dir filesep 'acqp.txt'],'w');
 for iii=1:num_dwi_b0s
     fprintf(fidd,'%i %i %i %f\n',line{1}');
@@ -178,11 +176,10 @@ end
 fclose(fidd);
     
 
-
 %also make index file
 fidd = fopen([out_dir filesep 'index.txt'],'w');
 
-index_array1=repmat(1,[numel(dwi_obj),1]); %this just writes as many 1s as there are dwis
+index_array1=repmat(1,[numel(dwi_obj),1]); %this just writes as many 1s as there are dwis -- the one tells eddy that the first line of acqp.txt is how your --imain images were acquired
 fprintf(fidd,'%i\n',index_array1');
 
 %you might use the next 3 lines if you were to append the topup b0s to the
