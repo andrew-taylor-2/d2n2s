@@ -1,9 +1,20 @@
-function [new_source,shift,trg_CoM]=align_tool(target_object_seg,source_object_seg,use_CoM)
+function [new_source,shift,trg_CoM]=align_tool(target_object_seg,source_object_seg,flags)
 %BIG NOTE: RIGHT NOW, THIS IS ONLY INTENDED TO BE USED ON images with the
 %same dimensions (eg two instances of the same sequence)
 
 %target object seg should be a dwi object with one element. 
 if length(target_object_seg)>1; error('unintended usage');end
+
+if ~exist('flags','var')
+    flags=[];
+end
+if ~isfield(flags,'com')
+    flags.com=1;
+end
+if ~isfield(flags,'reslice')
+    flags.reslice=1;
+end
+
 
 %ensure correct usage
 assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
@@ -12,7 +23,7 @@ assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
 %% move to align CoM if user has specified so
 
 shift=eye(4); %to be used if ~use_CoM
-if use_CoM
+if flags.com
     trg_CoM=centerOfMass(target_object_seg.img);
     src_CoM=centerOfMass(source_object_seg(1).img);
     
@@ -33,7 +44,7 @@ for j = 1:length(source_object_seg)
 end
 
 big_obj=join_obj(target_object_seg,source_object_seg);
-if use_CoM % you don't need to reslice if you're not moving anything
+if flags.reslice % you don't need to reslice if you're not moving anything
     wrtflg        = spm_get_defaults('realign.write');
     wrtflg.interp   = 1;
     wrtflg.which    = [1 0];
