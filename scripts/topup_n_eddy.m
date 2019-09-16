@@ -130,6 +130,7 @@ num_dwi_b0s=numel(idx_b0_dwi);
 if isfield(topup_obj,'bval')
     idx_b0_topups=find([topup_obj.bval]==0);
 else %assume they're all b0s
+    warning('couldn''t find bvals for topup images -- assuming they''re all b0s')
     idx_b0_topups=1:numel(topup_obj);
 end
 num_top_b0s=numel(idx_b0_topups);
@@ -147,22 +148,21 @@ for i=1:2
 end
 
 %build two lines for acqp.txt
-stringss={'j','j-'}; %known direction strings
-vectorss={[0 1 0],[0 -1 0]};% corresponding vectors; 
+stringss={'j','j-','i','i-'}; %known direction strings
+vectorss={[0 1 0],[0 -1 0],[1 0 0],[-1 0 0]};% corresponding vectors;
 
 for i=1:2
-    time{i}=j_struct{i}.TotalReadoutTime;
+    time=j_struct{i}.TotalReadoutTime;
     dir_string{i}=j_struct{i}.PhaseEncodingDirection;
     
-    if all(dir_string{i}==stringss{1})
-        vec{i}=vectorss{1};
-    elseif all(dir_string{i}==stringss{2})
-        vec{i}=vectorss{2};
-    else
-        error('Unknown PEdirection string')
-    end
+    match_bool=strcmp(stringss,dir_string{i});
+    assert(sum(match_bool)==1,'Couldn''t read your PEdirection string')
     
-    line{i}=[vec{i} time{i}]; 
+    %match vector representation
+    vec=vectorss{match_bool};
+    
+    %this is a unique line of acqp.txt
+    line{i}=[vec time]; 
 end
 
 
