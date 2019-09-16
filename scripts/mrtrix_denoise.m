@@ -17,14 +17,13 @@ assert(numel(spm_vol(fn_4d))>1,'only works on 4d niis');
 
 %% do the simple case if shell,exe not defined
 %note: I wrote this in vim and not my normal matlab environment, so be wary of things like unclosed quotes etc
-if ~exists('shell','var') && ~exists('exe','var') 
+if ~exist('shell','var') && ~exist('exe','var') 
     warning('no shell or exe given -- assuming you''re on a mac or unix and you''ve got mrtrix set up for command line')
     [a1,b1,c1]=fileparts(fn_4d);
-    [a2,b2,c2]=fileparts(exe); 
 
     %commands
-    command1=['dwidenoise "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,'noise.'...
-    'nii') '" -force'];
+    command1=['dwidenoise "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,['noise.'...
+    'nii']) '" -force'];
     [status{1},cmdout{1}] = system(command1);
 
     command2= ['mrcalc "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -subtract'...
