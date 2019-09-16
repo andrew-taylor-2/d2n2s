@@ -1,8 +1,15 @@
-function varargout=mrtrix_denoise(fn_4d,suffix,shell,exe)
+function varargout=mrtrix_denoise(fn_4d,suffix,shell,exe,prefix)
 % operates on files/folders
+%
+% THIS IS REALLY GROSS AND CAN BE CLEANED UP BY MAKING THE FORM OF THE
+% COMMANDS A VARIABLE
 %
 % This function is included for ease of use on windows -- dwidenoise is much
 % more straightforward to use on unix-like systems. Just use command line for these cases
+
+if ~exist('prefix','var')
+    prefix='';
+end
 
 %convert strings to char just in case
 if isstring(fn_4d)
@@ -17,17 +24,17 @@ assert(numel(spm_vol(fn_4d))>1,'only works on 4d niis');
 
 %% do the simple case if shell,exe not defined
 %note: I wrote this in vim and not my normal matlab environment, so be wary of things like unclosed quotes etc
-if ~exist('shell','var') && ~exist('exe','var') 
+if ( ~exist('shell','var') || isempty(shell) ) && ( ~exist('exe','var') || isempty(exe) )
     warning('no shell or exe given -- assuming you''re on a mac or unix and you''ve got mrtrix set up for command line')
     [a1,b1,c1]=fileparts(fn_4d);
 
     %commands
-    command1=['dwidenoise "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,['noise.'...
+    command1=['dwidenoise "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -noise "' fullfile(a1,[prefix 'noise.'...
     'nii']) '" -force'];
     [status{1},cmdout{1}] = system(command1);
 
-    command2= ['mrcalc "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -subtract'...
-    ' "' fullfile(a1,'res.nii') '" -force'];
+    command2= ['mrcalc "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -subtract'...
+    ' "' fullfile(a1,[ prefix 'res.nii']) '" -force'];
     [status{2},cmdout{2}] = system(command2);
 
     %handle outs -- wrote this a while ago, might not be necessary now
@@ -74,12 +81,12 @@ else
     sep=' ';
 end
 if casee==2 %exe dwidenoise is given
-    command1=[shell sep exe ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,'noise.nii') '" -force']
+    command1=[shell sep exe ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -noise "' fullfile(a1,[prefix 'noise.nii']) '" -force']
     [status{1},cmdout{1}] = system(command1);
 end
 
 if casee==1 %exe folder is given
-    command1=[shell sep fullfile(exe,'dwidenoise') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -noise "' fullfile(a1,'noise.nii') '" -force']
+    command1=[shell sep fullfile(exe,'dwidenoise') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -noise "' fullfile(a1,[prefix 'noise.nii']) '" -force']
     [status{1},cmdout{1}] = system(command1);
 end
 %make sure fullfile doesn't screw this up; the file/directory seperation
@@ -100,11 +107,11 @@ fnarr
 %command = ['C:/Programs/msys64/mingw64.exe C:\Programs\msys64\home\Andrew\mrtrix3\bin\mrcalc ' root '/com/denoising/4dall.nii ' root '/com/denoising/4D_DN.nii -subtract ' root '/com/denoising/res.nii -force'];
 %[status,cmdout] = system(command);
 if casee==2 %exe is given directly
-    command2= [shell sep fullfile(a2,'mrcalc') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -subtract "' fullfile(a1,'res.nii') '" -force'];
+    command2= [shell sep fullfile(a2,'mrcalc') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -subtract "' fullfile(a1,[prefix 'res.nii']) '" -force'];
     [status{2},cmdout{2}] = system(command2);
 end
 if casee==1 %exe folder is given
-    command2= [shell sep fullfile(a1,'mrcalc') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[b1 suffix c1]) '" -subtract "' fullfile(a1,'res.nii') '" -force'];
+    command2= [shell sep fullfile(a1,'mrcalc') ' "' fullfile(a1,[b1 c1]) '" "' fullfile(a1,[prefix b1 suffix c1]) '" -subtract "' fullfile(a1,[prefix 'res.nii']) '" -force'];
     [status{2},cmdout{2}] = system(command2);
 end
 
