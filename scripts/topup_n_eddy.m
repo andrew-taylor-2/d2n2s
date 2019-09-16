@@ -35,12 +35,12 @@ topups=d2n2s(topup_dir,tflags); %note that topup acquisitions might not have acc
 
 %% make a mask
 %find the first b0
-idx_b0s=find([dwis.bval]==0);
+idx_b0s=find([dwis.bval]<101);
 idx_b0s_1st=idx_b0s(1);
 
 %also do this for topups for later
 if isfield(topups,'bval')
-    idx_b0s_topups=find([topups.bval]==0);
+    idx_b0s_topups=find([topups.bval]<101);
 else %assume that all images are b0s
     idx_b0s_topups=1:numel(topups); %there's probably a better way than to use this; let's see how it shakes out
 end
@@ -119,11 +119,11 @@ function simple_acqp(dwi_obj,topup_obj,out_dir)
 
 %% find out how many b0s you had from each scan
 %this sort of duplicates efforts from the main body of the script...
-idx_b0_dwi=find([dwi_obj.bval]==0);
+idx_b0_dwi=find([dwi_obj.bval]<101);
 num_dwi_b0s=numel(idx_b0_dwi);
 
 if isfield(topup_obj,'bval')
-    idx_b0_topups=find([topup_obj.bval]==0);
+    idx_b0_topups=find([topup_obj.bval]<101);
 else %assume they're all b0s
     warning('couldn''t find bvals for topup images -- assuming they''re all b0s')
     idx_b0_topups=1:numel(topup_obj);
