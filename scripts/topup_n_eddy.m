@@ -92,6 +92,8 @@ bvecs_fn=dwis(1).fns.bvec;
 bvals_fn=dwis(1).fns.bval;
 dwi_image_fn=dwis(1).fns.nii;
 
+ensure_bvecs_are_fsl_convention(bvecs_fn);
+
 %% run the FSL commands!
 eddy_dir=[outdir filesep 'eddy'];
 out_fn=[eddy_dir filesep 'eddyd'];
