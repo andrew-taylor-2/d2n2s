@@ -10,6 +10,10 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 %incorrect data loading. takes a single string that should contain 'bvec',
 %'bval', 'img','nii', or 'json'
 
+%flags.b0 - should we assume that folders not containing bvecs/bvals are
+%b0s? default yes, but this could be changed by the contents of a json
+%file, if present
+
 %I found in making this function that there was a tradeoff between clarity
 %about what the script was doing and making the script try its very best to
 %give the user what they want. I chose to try to give the user what they
@@ -163,7 +167,7 @@ if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %i
     end
     
     
-elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~isempty(dir(flags.pick)) % if the user HAS specified the nii fn himself
+elseif isfield(flags,'pick') && ~isempty(flags.pick) && ~exist(flags.pick,'file') % if the user HAS specified the nii fn himself
     dnii=dir(flags.pick);
 end
 
