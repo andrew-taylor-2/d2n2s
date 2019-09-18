@@ -10,7 +10,7 @@ clear p_init
 p=inputParser;
 
 %annoyingly, I have to do this again or it'll mess up
-addRequired(p,'read_write_str', @(str) sum(strcmpi({'read','write'},str))==1 )
+addRequired(p,'read_write_str', @(str) sum(strcmpi({'read','write','coregister'},str))==1 )
 %in this weird case it's actually useful for them not to programmatically
 %assign things to my variables....
 
