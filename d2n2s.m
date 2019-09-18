@@ -26,6 +26,7 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 % function, it's making this function look bloated
 
 %% random input sanitizing
+% I SHOULD STICK FLAGS INTO make_flags() TO SANITIZE IT
 
 if ~exist('flags','var')
     flags=[];

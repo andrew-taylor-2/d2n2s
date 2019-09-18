@@ -1,5 +1,8 @@
 function obj3=join_obj(obj1,obj2)
 % operates on "objects" (structures)
+%
+% this is actually kind of general, will help you concat dissimilar
+% structures if you don't care about adding empty fields
     fldn1  = fieldnames(obj1);
     fldn2  = fieldnames(obj2);
     for i=1:length(fldn1)
