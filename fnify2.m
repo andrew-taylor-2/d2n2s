@@ -10,9 +10,10 @@ elseif isempty(dir_object) && ~bhvr_bin
     fn='';
     return
 elseif numel(dir_object)>1
-    warning(['numel of object from dir call is greater than 1.\n -- it''s ' num2str(numel(dir_object)) ' -- using the first.']);
+    warning(['numel of object from dir call is greater than 1.\n -- it''s ' num2str(numel(dir_object)) ' -- using the least recently modified file.']);
 end
+dir_object=dir_object(choose_output(@() min(cat(1,dir_object.datenum)),2)); 
 
-fn=[dir_object(1).folder filesep dir_object(1).name];
+fn=[dir_object.folder filesep dir_object.name];
 end
 
