@@ -227,13 +227,14 @@ if ~isempty(dnii)
             % tell you about it to the best of my understanding
             
             % new comment:
-            % it was actually important somehow. I commented it, and later
-            % on, when I tried to concatenate spm_vol objects which
-            % previously had different datatypes and write, it messed up
-            % and wrote noise. I'm still not sure exactly why this is, but
+            % it was actually important somehow. I'm still not sure exactly why this is, but
             % I've checked that this is functioning well empirically and it
             % is so.... it stays.
             
+            % new new comment: 
+            % this line does seem to alert spm to the fact that it doesn't
+            % support .nii.gz files and causes an error but... they're "not
+            % supported" anyway so whatever
             dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
         end
     end
