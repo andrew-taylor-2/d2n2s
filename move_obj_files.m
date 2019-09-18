@@ -1,4 +1,4 @@
-function move_obj_files(dwi_object,folder_to_write,name)
+function dwi_object=move_obj_files(dwi_object,folder_to_write,name)
 %right now I'm gonna implement it as if every element has the same fn. we
 %can complicate later
 
@@ -33,7 +33,7 @@ for i=1:numel(fn_field_names) % for each type of file
     movefile(allfns{1},new_fn)
     
     %change dwi_object to reflect new location
-    [dwi_object(:).fns.(fn_field_names{i})]=deal(new_fn);
-    
+    dwi_object=arrayfun(@(x) setfield(x,'fns',fn_field_names{i},new_fn),dwi_object);
+
 end
     
