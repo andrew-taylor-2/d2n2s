@@ -10,8 +10,22 @@ function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 %     image will be resliced thusly. If 1, reg will be estimated and the
 %     orientation matrix will be updated to reflect the change of origin.
 %     If 0, "new_source" will be equal to source_obj_seg and M will be the
-%     estimated rigid body reg. If -1, source_obj_seg will be resliced but
-%     not moved to match target_object_seg
+%     estimated rigid body reg. 
+
+%     If -1, source_obj_seg will be resliced but
+%     not moved to match target_object_seg (Note that this does not mean
+%     that target_object_seg won't be moved at all. it will be moved by
+%     target.hdr.mat\source.hdr.mat -- aligning the coordinate systems. I
+%     have a fix for this that should be an option of this script. I think
+%     you can reslice without moving by using align_tool no CoM no reslice
+%     and then reslicing (apply=-1) with this script. I'll make sure and
+%     maybe add this in the future.
+
+% In the future, normalize how things are output -- currently, a side
+% effect of reslicing is that new_source takes on empty fields to match
+% target_object_seg. And this doesn't happen if reslicing is not
+% performed. This should not practically affect function, but it
+% could trip up user-written code.
 
 if length(target_object_seg)>1; error('unintended usage');end
 
