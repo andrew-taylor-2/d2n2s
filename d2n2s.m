@@ -332,22 +332,41 @@ if ~isequal(flags.b0,0) && exist('dwi','var') && isempty(dbvec) && isempty(dbval
     end
     
     % if we want bvecs filled in
+    warnings=[false false];
     if ~contains(flags.no,'bvec','IgnoreCase',1)
+        
         % assign to struct
         [dwi.bvec]=deal([0;0;0]);
+        
+        %warn
+        warnings(1)=true;
     end
     
     % if we want bvals filled in
     if ~contains(flags.no,'bval','IgnoreCase',1)
+        
         % assign to struct
         [dwi.bval]=deal(0);
+        
+        %warn
+        warnings(2)=true;
     end
     
-    % warning
+    % warnings -- code could be made prettier or cooler but I think it
+    % would mean slowing down and/or making the warning message harder to
+    % read
     if contains(dcm2niixd_folder,'b0','IgnoreCase',1)
-        warning('there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''. setting bvals and bvecs to 0.')
+        warning_prefix=['there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''' newline];
     else
-        warning(['there are no bvals or bvecs' newline 'ALSO the folder you have supplied doesn''t have ''b0'' in the name.' newline 'Still, setting bvals and bvecs to 0 as a best guess.'])
+        warning_prefix=['there are no bvals or bvecs' newline 'ALSO the folder you have supplied doesn''t have ''b0'' in the name. Still,' newline];
+    end
+    
+    if all(warnings)
+        warning([warning_prefix 'setting bvals and bvecs to 0.'])
+    elseif warnings(1)
+        warning([warning_prefix 'setting bvecs to 0.'])
+    elseif warnings(2)
+        warning([warning_prefix 'setting bvals to 0.'])
     end
 end
 
