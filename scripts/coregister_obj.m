@@ -83,8 +83,10 @@ end % endif flags.apply~=-1
 %if ~isfield(flags,'apply') || isequal(flags.apply,2)
 
 %reslice
-big_obj=join_obj(target_object_seg,source_obj_seg); %this is how spm wants em
+[big_obj,~,new_src_fields]=join_obj(target_object_seg,source_obj_seg); %this is how spm wants em
 big_obj=spm_reslice_at(big_obj,wrtflg);%inputs need to be target,source,other
 new_source=big_obj(2:end);
-%end
+new_source=rmfield(new_source,new_src_fields);
+
+%end implicit "if"
 end
