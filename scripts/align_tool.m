@@ -36,7 +36,7 @@ trg_space=target_object_seg.hdr.mat;
 for j = 1:length(source_object_seg)
     %next line causes (in spm_reslice) source voxels to shift, then source
     %hdr.mat to be set to target
-    source_object_seg(j).hdr.mat=trg_space*shift;
+    source_object_seg(j).hdr.mat=shift*trg_space;
     
     %set the others to the same
     source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
