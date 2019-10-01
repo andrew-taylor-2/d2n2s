@@ -17,7 +17,7 @@ end
 
 
 %ensure correct usage
-assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
+% assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
 
 
 %% move to align CoM if user has specified so
@@ -32,13 +32,20 @@ if flags.com
     shift=spm_matrix(src_shift);
 end
 
-trg_space=target_object_seg.hdr.mat;
+trg_space_params=spm_imatrix(target_object_seg.hdr.mat);
+
+
+
 for j = 1:length(source_object_seg)
     %next line causes (in spm_reslice) source voxels to shift, then source
-    %hdr.mat to be set to target
-    source_object_seg(j).hdr.mat=shift*trg_space;
+    %hdr.mat to be take on target's origin (but keep its own voxel size)
     
-    %set the others to the same
+    src_space_params=spm_imatrix(source_object_seg(j).hdr.mat);
+    sign_change=arrayfun(@(ii) sign(src_space_params(ii))*sign(trg_space_params(ii)),7:9);
+    src_with_trg_origin=spm_matrix([trg_space_params(1:6) src_space_params(7:9).*sign_change trg_space_params(10:12)]);
+    
+    %set all records of orientation to this just in case
+    source_object_seg(j).hdr.mat=shift*src_with_trg_origin;
     source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
     source_object_seg(j).hdr.private.mat0=source_object_seg(j).hdr.mat;
 end
