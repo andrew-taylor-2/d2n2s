@@ -1,9 +1,13 @@
 function dwi=d2n2s(dcm2niixd_folder,flags)
 % operates on files/folders
 %
+
 %flags.pick - if this is specified, this nii filename will be chosen to have it's
 %header/image information loaded. just in case, for instance, one has
 %many nii files within their dcm2niixd_folder
+
+%flags.glob - like flags.pick, but the string will be entered into dir and
+%then fnify2 to pick the file
 
 %flags.no  - tells the program not to read certain things. could be used to
 %speedup if you don't need that info. could be used to avoid errors an
@@ -43,6 +47,15 @@ if isfield(flags,'pick') && ~isempty(flags.pick) && isstring(flags.pick)
     flags.pick=char(flags.pick);
 end
 
+if isfield(flags,'glob') && ~isempty(flags.glob) && isstring(flags.glob)
+    flags.glob=char(flags.glob);
+end
+
+%don't have both pick and glob
+if isfield(flags,'pick') && isfield(flags,'glob')
+    error('can''t have both pick and glob')
+end
+
 %these next two have to be initialized 
 if ~isfield(flags,'no') || isempty(flags.no) 
     flags.no='';
@@ -64,10 +77,22 @@ dbval=[dbval;dbval2]; %just in case
 %dnii=dir([dcm2niixd_folder filesep '*.nii']); %dnii gets set later and is part of a conditional
 djson=dir([dcm2niixd_folder filesep '*.json']);
 
-%if they've picked a file,
-if isfield(flags,'pick') && ~isempty(flags.pick) 
-    %look for files with the same "name"
-    [pp,nn,ee]=fileparts(flags.pick);
+%if they've picked or globbed a file,
+using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
+using_glob=(isfield(flags,'glob') && ~isempty(flags.glob))
+
+if using_pick || using_glob
+    
+    if using_pick
+        %look for files with the same "name"
+        [pp,nn,ee]=fileparts(flags.pick);
+    end
+    
+    if using_glob
+        dir_out=dir(flags.glob);
+        dir_out_fn=fnify2(dir_out);
+        [pp,nn,ee]=fileparts(dir_out_fn);
+    end
     
     matching_bvec_name=[pp filesep nn '.bvec'];
     if exist(matching_bvec_name,'file')
@@ -85,7 +110,8 @@ if isfield(flags,'pick') && ~isempty(flags.pick)
     end
     
 end
-    
+%yes, the logic flow is weird and gross looking. if only there were an
+%"if,else,finally"?
     
 
 %% WARNINGS
@@ -158,6 +184,9 @@ end
 
 % get nifti name with dir or flags.pick
 if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %if the user has not opted to specify the nii fn himself
+    %on the line above, I think I should warn the user if they are using
+    %pick but it can't find the file.
+    
     dnii=dir([dcm2niixd_folder filesep '*.nii']);
     
     if isempty(dnii)
