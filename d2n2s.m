@@ -199,6 +199,9 @@ if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %i
     
 elseif isfield(flags,'pick') && ~isempty(flags.pick) && exist(flags.pick,'file') % if the user HAS specified the nii fn himself
     dnii=dir(flags.pick);
+    
+elseif using_glob
+    dnii=dir_out;
 end
 
 
