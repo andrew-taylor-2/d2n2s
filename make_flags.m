@@ -17,6 +17,7 @@ addRequired(p,'read_write_str', @(str) sum(strcmpi({'read','write','coregister'}
 if strcmpi(read_write_str,'read')
 
     addParameter(p,'pick','',@(x) ischar(x)||isstring(x) )
+    addParameter(p,'glob','',@(x) ischar(x)||isstring(x) )
     addParameter(p,'b0',1,@(x) isnumeric(x) && sum(x==[0 1])==1 ) %prolly slower alt check: @(x) isnumeric(x) && sum(x==[0 1])==1 
     addParameter(p,'no','',@(x) ischar(x)||isstring(x) )
     %the 'no' option is going to become noload and nofns

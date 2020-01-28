@@ -7,7 +7,10 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 %many nii files within their dcm2niixd_folder
 
 %flags.glob - like flags.pick, but the string will be entered into dir and
-%then fnify2 to pick the file
+%then fnify2 to pick the file. NOTE that while that while "pick"ing a .nii,
+%users will enter the full path fn, users will "glob" only the name and
+%extension of a file within the dcm2niixd_folder. The treatment of these
+%two fields will hopefully be made more consistent in future updates.
 
 %flags.no  - tells the program not to read certain things. could be used to
 %speedup if you don't need that info. could be used to avoid errors an
@@ -52,7 +55,7 @@ if isfield(flags,'glob') && ~isempty(flags.glob) && isstring(flags.glob)
 end
 
 %don't have both pick and glob
-if isfield(flags,'pick') && isfield(flags,'glob')
+if (isfield(flags,'pick') && ~isempty(flags.pick)) && (isfield(flags,'glob') && ~isempty(flags.glob))
     error('can''t have both pick and glob')
 end
 
@@ -79,7 +82,7 @@ djson=dir([dcm2niixd_folder filesep '*.json']);
 
 %if they've picked or globbed a file,
 using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
-using_glob=(isfield(flags,'glob') && ~isempty(flags.glob))
+using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
 
 if using_pick || using_glob
     
@@ -89,7 +92,7 @@ if using_pick || using_glob
     end
     
     if using_glob
-        dir_out=dir(flags.glob);
+        dir_out=dir(fullfile(dcm2niixd_folder,flags.glob));
         dir_out_fn=fnify2(dir_out);
         [pp,nn,ee]=fileparts(dir_out_fn);
     end
@@ -182,10 +185,13 @@ end
 
 %% NIFTI FILE
 
+%what if pick or glob fails? exit.
+if (using_pick && ~exist(flags.pick,'file')) || (using_glob && isempty(dir_out))
+    error('pick or glob failed, exiting')
+end
+
 % get nifti name with dir or flags.pick
-if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %if the user has not opted to specify the nii fn himself
-    %on the line above, I think I should warn the user if they are using
-    %pick but it can't find the file.
+if ~using_pick && ~using_glob %if the user has not opted to specify the nii fn himself
     
     dnii=dir([dcm2niixd_folder filesep '*.nii']);
     
@@ -197,7 +203,7 @@ if ~isfield(flags,'pick') || isempty(flags.pick) || ~exist(flags.pick,'file') %i
     end
     
     
-elseif isfield(flags,'pick') && ~isempty(flags.pick) && exist(flags.pick,'file') % if the user HAS specified the nii fn himself
+elseif using_pick % if the user HAS specified the nii fn himself
     dnii=dir(flags.pick);
     
 elseif using_glob
