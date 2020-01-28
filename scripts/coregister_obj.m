@@ -21,6 +21,10 @@ function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 %     and then reslicing (apply=-1) with this script. I'll make sure and
 %     maybe add this in the future.
 
+%     : stringent: if 1 (0 default), changes a few options to try and get a
+%     better registration with a time cost. No guarantee that registration
+%     will be any better
+
 % In the future, normalize how things are output -- currently, a side
 % effect of reslicing is that new_source takes on empty fields to match
 % target_object_seg. And this doesn't happen if reslicing is not
@@ -33,10 +37,20 @@ if ~exist('flags','var') || ~isfield(flags,'apply')
     flags.apply=2;
 end
 
+if ~exist('flags','var') || ~isfield(flags,'stringent')
+    flags.stringent=0;
+end
+
 % coregistration and reslicing parameters
 estflg.cost_fun = 'nmi';
-estflg.sep      = [4 2];
-estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+if flags.stringent~=1
+    estflg.sep      = [4 2];
+    estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+else %we want more stringent
+    estflg.sep      = [2 1]; %sample more 
+    estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.0005 0.0005]; %require closer final match
+end
+    
 estflg.fwhm     = [7 7];
 wrtflg        = spm_get_defaults('realign.write');
 wrtflg.interp   = 1;

@@ -34,6 +34,7 @@ elseif strcmpi(read_write_str,'coregister')
     addParameter(p,'no0',0, @(x) isequal(x,1) || isequal(x,0) )
     addParameter(p,'animal',0, @(x) isequal(x,1) || isequal(x,0) )
     addParameter(p,'apply',2, @(x) isnumeric(x) && sum(x==[-1 0 1 2])==1 )
+    addParameter(p,'stringent',0, @(x) isequal(x,1) || isequal(x,0) )
     
 end
 
