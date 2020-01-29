@@ -36,6 +36,9 @@ elseif strcmpi(read_write_str,'coregister')
     addParameter(p,'apply',2, @(x) isnumeric(x) && sum(x==[-1 0 1 2])==1 )
     addParameter(p,'stringent',0, @(x) isequal(x,1) || isequal(x,0) )
     
+    addParameter(p,'estflg',struct(), @(x) isstruct(x) )
+    addParameter(p,'wrtflg',struct(), @(x) isstruct(x) )
+    
 end
 
 %grab the parsed inputs and assign them to flags.()

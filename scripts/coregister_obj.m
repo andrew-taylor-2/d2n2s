@@ -25,6 +25,15 @@ function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 %     better registration with a time cost. No guarantee that registration
 %     will be any better
 
+%     : estflg: these will overwrite the default estflgs in this script.
+%     these options affect spm_coreg. NOTE if estflg and animal are used
+%     together, animal will scale down flags.estflg options -- AKA using flags.estflg
+%     does not "once and for all override" the estflgs that are given to
+%     spm_coreg
+
+%     : wrtflg: see estflg
+
+
 % In the future, normalize how things are output -- currently, a side
 % effect of reslicing is that new_source takes on empty fields to match
 % target_object_seg. And this doesn't happen if reslicing is not
@@ -42,19 +51,26 @@ if ~exist('flags','var') || ~isfield(flags,'stringent')
 end
 
 % coregistration and reslicing parameters
+
+% available estflg options are cost_fun,sep,tol,fwhm
 estflg.cost_fun = 'nmi';
+estflg.fwhm     = [7 7];
 if flags.stringent~=1
     estflg.sep      = [4 2];
     estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
 else %we want more stringent
     estflg.sep      = [2 1]; %sample more 
     estflg.tol      = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.0005 0.0005]; %require closer final match
-end
-    
-estflg.fwhm     = [7 7];
+end    
+
+% available options are prefix,mask,interp,wrap,which
 wrtflg        = spm_get_defaults('realign.write');
 wrtflg.interp   = 1;
 wrtflg.which    = [1 0];
+
+% set flags if user has opted to
+wrtflg=append_flags(wrtflg,flags.wrtflg)
+estflg=append_flags(estflg,flags.estflg)
 
 if ~isequal(flags.apply,-1) % if the user doesn't want to completely skip coreg and get to reslicing
     
@@ -117,4 +133,16 @@ new_source=big_obj(2:end);
 new_source=rmfield(new_source,new_src_fields);
 
 %end implicit "if"
+end
+
+function to_overwrite=append_flags(original_flgs,to_overwrite)
+% if to_overwrite doesn't have a field that original_flgs does, append the
+% original_flgs field. Then give the user back to_overwrite.
+
+fnms  = fieldnames(original_flgs);
+for i=1:length(fnms)
+    if ~isfield(to_overwrite,fnms{i})
+        to_overwrite.(fnms{i}) = original_flgs.(fnms{i});
+    end
+end
 end
