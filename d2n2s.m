@@ -286,7 +286,29 @@ if ~isempty(dnii)
             % I'm commenting it. It doesn't make sense to use a hack I
             % don't understand to reduce the functionality of this program
             
-%             dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
+            % shiny new comment:
+            % As earlier comments have noted, commenting allows you to use
+            % .nii.gz files. However, .nii.gz files will inexplicably get a
+            % obj.hdr.dat field (((possibly because the contrived .fn that is
+            % handed to .private.dat.fname is always .nii and not .nii.gz,
+            % and thus escapes the "unknown filename extension" error in
+            % line 404 of nifti/subsasgn>assigndat (wait, you would think the hack would help files slip by... what) ))), while normal .nii
+            % won't have this (both types do get a obj.hdr.private.dat
+            % field, however). This will cause a "subscripted assignment
+            % between dissimilar structures" error in spm_reslice_at.m,
+            % specifically at 
+            
+            % for i=1:numel(P2)
+            % P(i)=P2(i).hdr; %field 'hdr' must exist
+            % end
+
+            % it seems like this could easily be remedied, but I have yet
+            % again been spooked out and reminded that "compressed nifti
+            % files are not supported" and the hassle of converting .nii.gz
+            % files is less than the stress of always wondering if my code
+            % is breaking silently but deadlyily.
+            
+            dwi(i).hdr.private.dat.fname=v0(i,:); %old old comment: this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
         end
     end
 end
