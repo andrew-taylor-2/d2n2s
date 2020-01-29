@@ -69,8 +69,8 @@ wrtflg.interp   = 1;
 wrtflg.which    = [1 0];
 
 % set flags if user has opted to
-wrtflg=append_flags(wrtflg,flags.wrtflg)
-estflg=append_flags(estflg,flags.estflg)
+wrtflg=append_flags(wrtflg,flags.wrtflg);
+estflg=append_flags(estflg,flags.estflg);
 
 if ~isequal(flags.apply,-1) % if the user doesn't want to completely skip coreg and get to reslicing
     
