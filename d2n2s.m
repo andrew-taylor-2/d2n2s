@@ -97,6 +97,8 @@ if using_pick || using_glob
         [pp,nn,ee]=fileparts(dir_out_fn);
     end
     
+    
+    
     matching_bvec_name=[pp filesep nn '.bvec'];
     if exist(matching_bvec_name,'file')
         dbvec=dir(matching_bvec_name);
@@ -279,7 +281,12 @@ if ~isempty(dnii)
             % this line does seem to alert spm to the fact that it doesn't
             % support .nii.gz files and causes an error but... they're "not
             % supported" anyway so whatever
-            dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
+            
+            % new new new comment:
+            % I'm commenting it. It doesn't make sense to use a hack I
+            % don't understand to reduce the functionality of this program
+            
+%             dwi(i).hdr.private.dat.fname=v0(i,:); %this line is included to protect the user, as assigning to dat(:) at all in matlab will overwrite whatever is contained in hdr.private.dat.fname. this is a property of the @file_array object. and it's spooky.
         end
     end
 end
