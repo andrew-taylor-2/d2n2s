@@ -119,19 +119,25 @@ end
 
 %% WARNINGS
 if length(dbvec)>1
-    warning('found more than one bvec file. using the ''first''.')
+    if ~contains(flags.no,'bvec','IgnoreCase',1)
+        warning('found more than one bvec file. using the ''first''.')
+    end
     dbvec=dbvec(1);
 end
 
 if length(dbval)>1
-    warning('found more than one bval file. using the ''first''.')
+    if ~contains(flags.no,'bval','IgnoreCase',1)
+        warning('found more than one bval file. using the ''first''.')
+    end
     dbval=dbval(1);
 end
 % if length(dnii)>1
 %     warning('found more than one nii file. using the ''first''.')
 % end
 if length(djson)>1
-    warning('found more than one json file. using the ''first''.')
+    if ~contains(flags.no,'json','IgnoreCase',1)
+        warning('found more than one json file. using the ''first''.')
+    end
     djson=djson(1);
 end
 
