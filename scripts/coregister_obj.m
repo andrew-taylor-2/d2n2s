@@ -31,7 +31,7 @@ function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 %     does not "once and for all override" the estflgs that are given to
 %     spm_coreg
 
-%     : wrtflg: see estflg
+%     : wrtflg: similar to estflg, but these options affect spm_reslice instead of spm_coreg
 
 
 % In the future, normalize how things are output -- currently, a side
