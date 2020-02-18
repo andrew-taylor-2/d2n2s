@@ -69,8 +69,13 @@ wrtflg.interp   = 1;
 wrtflg.which    = [1 0];
 
 % set flags if user has opted to
+if isfield(flags,'wrtflg')
 wrtflg=append_flags(wrtflg,flags.wrtflg);
+end
+
+if isfield(flags,'estflg')
 estflg=append_flags(estflg,flags.estflg);
+end
 
 if ~isequal(flags.apply,-1) % if the user doesn't want to completely skip coreg and get to reslicing
     
