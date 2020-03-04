@@ -434,12 +434,13 @@ if ~isequal(flags.b0,0) && exist('dwi','var') && isempty(dbvec) && isempty(dbval
         warning_prefix=['there are no bvals or bvecs' newline 'ALSO the folder you have supplied doesn''t have ''b0'' in the name. Still,' newline];
     end
     
+    warning_suffix=[' if this isn''t desired, set flags.b0 to [0]'];
     if all(warnings)
-        warning([warning_prefix 'setting bvals and bvecs to 0.'])
+        warning([warning_prefix 'setting bvals and bvecs to 0.' warning_suffix])
     elseif warnings(1)
-        warning([warning_prefix 'setting bvecs to 0.'])
+        warning([warning_prefix 'setting bvecs to 0.' warning_suffix])
     elseif warnings(2)
-        warning([warning_prefix 'setting bvals to 0.'])
+        warning([warning_prefix 'setting bvals to 0.' warning_suffix])
     end
 end
 
