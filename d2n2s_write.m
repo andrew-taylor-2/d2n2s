@@ -1,4 +1,4 @@
-function d2n2s_write(dwi,folder,name,flags)
+function out_fn=d2n2s_write(dwi,folder,name,flags)
 %take matlab dwi object and write it to file
 % input is "object" (structure created by d2n2s), output is files
 %from andrew's OOP scripts
@@ -13,6 +13,7 @@ function d2n2s_write(dwi,folder,name,flags)
 %  flags.vol - 3 for 3d files. 4 for a 4d file
 %  flags.nfn - 1 for writing 3d volumes according to 'folder','name'.
 %            - 0 for using the 'dwi.fn' field to write. 1 is default
+%  flags.del - 1 for deleting the file you're about to write to. default 0
 
 %if you wanted to use this on only one field, you could make another object
 %with just the field. or use a segment of the object
@@ -31,6 +32,10 @@ if ~exist(folder,'dir')
         mkdir(folder)
     catch
     end
+end
+
+if ~isfield(flags,'del') || isempty(flags.del)
+    flags.del=0;
 end
 
 %% bvals
@@ -81,7 +86,7 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
     %% if you're writing a 4d volume
     if flags.vol==4 
         fn=fullfile(folder,[name '.nii']); %this is named according to the function's inputs
-        if exist(fn,'file'); warning('you''re writing to an image file that already exists; note that if you overwrite an existing image with an image containing less volumes, the extra volumes at the end will stay');end
+        if exist(fn,'file') && flags.del~=1; warning('you''re writing to an image file that already exists; note that if you overwrite an existing image with an image containing less volumes, the extra volumes at the end will stay');end
         
             %% handle variable input dts
             
@@ -133,6 +138,11 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
             %set all obj.hdr.dt(1) to this datatype
             
         %% set values and write 4d    
+        if flags.del==1
+            %warning('off','MATLAB:DELETE:FileNotFound')
+            delete(fn)
+            %warning('on','MATLAB:DELETE:FileNotFound')
+        end
         for i1=1:length(dwi)
             dwi(i1).hdr.fname=fn;
             dwi(i1).hdr.n=[i1,1];
@@ -168,7 +178,7 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
         end
     end
 end
-
+out_fn=fn;
 %% json file
 if isfield(dwi,'json')
     empty_jsons=arrayfun(@(x) isempty(x.json),dwi);
