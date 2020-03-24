@@ -19,8 +19,8 @@ if strcmpi(read_write_str,'read')
     addParameter(p,'pick','',@(x) ischar(x)||isstring(x) )
     addParameter(p,'glob','',@(x) ischar(x)||isstring(x) )
     addParameter(p,'b0',1,@(x) isnumeric(x) && sum(x==[0 1])==1 ) %prolly slower alt check: @(x) isnumeric(x) && sum(x==[0 1])==1 
+    addParameter(p,'gz',0,@(x) isnumeric(x) && sum(x==[0 1])==1 )
     addParameter(p,'no','',@(x) ischar(x)||isstring(x) )
-    %the 'no' option is going to become noload and nofns
 
 elseif strcmpi(read_write_str,'write')
     
@@ -28,6 +28,7 @@ elseif strcmpi(read_write_str,'write')
     addParameter(p,'gr',1,@(x) isequal(x,1) || isequal(x,0) )
     addParameter(p,'vol',4,@(x) isequal(x,3) || isequal(x,4) )
     addParameter(p,'nfn',0,@(x) isequal(x,1) || isequal(x,0) )
+    addParameter(p,'del',0,@(x) isequal(x,1) || isequal(x,0) )
     
 elseif strcmpi(read_write_str,'coregister')
     
