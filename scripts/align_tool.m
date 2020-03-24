@@ -9,15 +9,54 @@ if ~exist('flags','var')
     flags=[];
 end
 if ~isfield(flags,'com')
-    flags.com=1;
+    flags.com=0;
 end
 if ~isfield(flags,'reslice')
     flags.reslice=1;
 end
-
+if ~isfield(flags,'flip')
+    flags.flip=0;
+end
 
 %ensure correct usage
 assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
+
+
+%% do flips if user wants to
+
+% change image to match orientation convention of target
+% i.e. only do 180 flips along any axis
+
+% this code was just added from shih_coreg_thursday (...) 
+
+mat_flip=eye(4);
+if target_object_seg(1).hdr.mat(1)*source_object_seg(1).hdr.mat(1)<0
+    %flip
+    for i=1:length(source_object_seg)
+        source_object_seg(i).img=flip(source_object_seg(i).img,1);
+%         mat_flip(1)=-1;
+    end
+end
+if target_object_seg(1).hdr.mat(6)*source_object_seg(1).hdr.mat(6)<0
+    %flip
+    for i=1:length(source_object_seg)
+        source_object_seg(i).img=flip(source_object_seg(i).img,2);
+%         mat_flip(6)=-1;
+    end
+end
+if target_object_seg(1).hdr.mat(11)*source_object_seg(1).hdr.mat(11)<0
+    %flip
+    for i=1:length(source_object_seg)
+        source_object_seg(i).img=flip(source_object_seg(i).img,3);
+%         mat_flip(11)=-1;
+    end
+end
+
+%
+% for i=1:length(source_object_seg)
+%     source_object_seg(i).hdr.mat=mat_flip*source_object_seg(i).mat; 
+% end
+
 
 
 %% move to align CoM if user has specified so
