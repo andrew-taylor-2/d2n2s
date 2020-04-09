@@ -43,7 +43,7 @@ end
 if isstring(dcm2niixd_folder)
     dcm2niixd_folder=char(dcm2niixd_folder);
 end
-if strcmp(dcm2niixd_folder(end),filesep)
+if strcmp(dcm2niixd_folder(end),filesep) %strcmp for right now works on struct, let's see if that stays in later versions...
     dcm2niixd_folder=dcm2niixd_folder(1:end-1); %this isn't actually necessary since dir will ignore double separators, but I'm doing this for clarity
 end
 
@@ -84,21 +84,25 @@ using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
 %determine if first-position input is folder, file, or dir object
 
 % guessing dir will be easiest to tell or rule out
+intype='';
 if ~using_pick && ~using_glob
     
     % guessing DIR will be easiest to tell or rule out -- do that first
     if isstruct(dcm2niixd_folder) && isfield(dcm2niixd_folder,'name') && isfield(dcm2niixd_folder,'folder')
+        intype='dirobj';
         flags.pick=fnify2(dcm2niixd_folder);
         using_pick=true;
+        
         
     %next try FILEname -- dir handling will be doing nothing as the rest of
     %the program already does dir handling
     elseif exist(dcm2niixd_folder,'file') && ~exist(dcm2niixd_folder,'dir')
+        intype='file';
         flags.pick=dcm2niixd_folder;
         using_pick=true;
     end
 end
-
+intype='dir';
 
 
 
@@ -152,20 +156,28 @@ end
 %the next section was one of the first sections, the values got replaced
 %later. I'm moving it later, but not assigning values if they already exist
 
+%in earlier versions, "pp" was dcm2niixd_folder. This was easily replacable
+%as long as i handled the case where we didn't pick or glob i.e. folder
+%input 
+if strcmp(intype,'dir')
+    pp=dcm2niixd_folder;
+end
+
 if ~exist('dbvec','var')
-    dbvec=dir([dcm2niixd_folder filesep '*.bvec']);
-    dbvec2=dir([dcm2niixd_folder filesep '*.bvecs']);
+    
+    dbvec=dir([pp filesep '*.bvec']);
+    dbvec2=dir([pp filesep '*.bvecs']);
     dbvec=[dbvec;dbvec2]; %just in case
 end
 
 if ~exist('dbval','var')
-    dbval=dir([dcm2niixd_folder filesep '*.bval']);
-    dbval2=dir([dcm2niixd_folder filesep '*.bvals']);
+    dbval=dir([pp filesep '*.bval']);
+    dbval2=dir([pp filesep '*.bvals']);
     dbval=[dbval;dbval2]; %just in case
 end
 
 if ~exist('djson','var')
-    djson=dir([dcm2niixd_folder filesep '*.json']);
+    djson=dir([pp filesep '*.json']);
 end
 
 
@@ -258,12 +270,13 @@ end
 % get nifti name with dir or flags.pick
 if ~using_pick && ~using_glob %if the user has not opted to specify the nii fn himself
     
-    dnii=dir([dcm2niixd_folder filesep '*.nii']);
+    dnii=dir([pp filesep '*.nii']);
     
     if isempty(dnii)
-        dnii=dir([dcm2niixd_folder filesep '*.nii.gz']);
+        dnii=dir([pp filesep '*.nii.gz']);
         if ~isempty(dnii)
             warning('couldn''t find a .nii file, but found a .nii.gz -- using')
+            flags.gz=1;
         end
     end
     
