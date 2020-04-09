@@ -129,7 +129,10 @@ if using_pick || using_glob
         [pp,nn,ee]=fileparts(dir_out_fn);
     end
     
-    
+    %nn might contain
+    if strcmp(nn(end-3:end),'.nii')
+        nn=nn(1:end-4);
+    end
     
     matching_bvec_name=[pp filesep nn '.bvec'];
     if exist(matching_bvec_name,'file')
@@ -155,6 +158,33 @@ end
 if contains(ee,'gz','IgnoreCase',true)
     flags.gz=1;
 end
+
+
+%the next section was one of the first sections, the values got replaced
+%later. I'm moving it later, but not assigning values if they already exist
+
+if ~exist('dbvec','var')
+    dbvec=dir([dcm2niixd_folder filesep '*.bvec']);
+    dbvec2=dir([dcm2niixd_folder filesep '*.bvecs']);
+    dbvec=[dbvec;dbvec2]; %just in case
+end
+
+if ~exist('dbval','var')
+    dbval=dir([dcm2niixd_folder filesep '*.bval']);
+    dbval2=dir([dcm2niixd_folder filesep '*.bvals']);
+    dbval=[dbval;dbval2]; %just in case
+end
+
+if ~exist('djson','var')
+    djson=dir([dcm2niixd_folder filesep '*.json']);
+end
+
+
+
+
+
+
+
 
 
 %% WARNINGS
