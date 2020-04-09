@@ -18,7 +18,7 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 %'bval', 'img','nii', or 'json'
 
 %flags.b0 - should we assume that folders not containing bvecs/bvals are
-%b0s? default yes, but this could be changed by the contents of a json
+%b0s? default NO (I no longer use mostly diffusion images lel), but this could be changed by the contents of a json
 %file, if present
 
 %I found in making this function that there was a tradeoff between clarity
@@ -38,6 +38,7 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 if ~exist('flags','var')
     flags=[];
 end
+
 
 if isstring(dcm2niixd_folder)
     dcm2niixd_folder=char(dcm2niixd_folder);
@@ -59,13 +60,15 @@ if (isfield(flags,'pick') && ~isempty(flags.pick)) && (isfield(flags,'glob') && 
     error('can''t have both pick and glob')
 end
 
-%these next two have to be initialized 
+
+
+%these next two have to be initialized
 if ~isfield(flags,'no') || isempty(flags.no) 
     flags.no='';
 end
 
 if ~isfield(flags,'b0') || isempty(flags.b0) 
-    flags.b0=1;
+    flags.b0=0;
 end
 
 if ~isfield(flags,'gz') || isempty(flags.gz) 
@@ -84,9 +87,34 @@ dbval=[dbval;dbval2]; %just in case
 %dnii=dir([dcm2niixd_folder filesep '*.nii']); %dnii gets set later and is part of a conditional
 djson=dir([dcm2niixd_folder filesep '*.json']);
 
-%if they've picked or globbed a file,
+%check if they've picked or globbed a file,
 using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
 using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
+
+%DETERMINE input type
+%determine if first-position input is folder, file, or dir object
+
+% guessing dir will be easiest to tell or rule out
+if ~using_pick && ~using_glob
+    
+    % guessing DIR will be easiest to tell or rule out -- do that first
+    if isstruct(dcm2niixd_folder) && isfield(dcm2niixd_folder,'name') && isfield(dcm2niixd_folder,'folder')
+        flags.pick=fnify2(dcm2niixd_folder);
+        using_pick=true;
+        
+    %next try FILEname -- dir handling will be doing nothing as the rest of
+    %the program already does dir handling
+    elseif exist(dcm2niixd_folder,'file') && ~exist(dcm2niixd_folder,'dir')
+        flags.pick=dcm2niixd_folder;
+        using_pick=true;
+    end
+end
+
+
+
+
+
+%get files with same name as pick or globbed file
 
 if using_pick || using_glob
     
@@ -118,10 +146,16 @@ if using_pick || using_glob
         djson=dir(matching_json_name);
     end
     
+    %yes, the logic flow is weird and gross looking. if only there were an
+    %"if,else,finally"?
+ 
 end
-%yes, the logic flow is weird and gross looking. if only there were an
-%"if,else,finally"?
-    
+   
+%check gz, if so set gz to 1
+if contains(ee,'gz','IgnoreCase',true)
+    flags.gz=1;
+end
+
 
 %% WARNINGS
 if length(dbvec)>1
