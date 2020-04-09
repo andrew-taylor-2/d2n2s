@@ -76,17 +76,6 @@ if ~isfield(flags,'gz') || isempty(flags.gz)
 end
 
 
-%% GRAB FILES
-
-dbvec=dir([dcm2niixd_folder filesep '*.bvec']);
-dbvec2=dir([dcm2niixd_folder filesep '*.bvecs']);
-dbvec=[dbvec;dbvec2]; %just in case
-dbval=dir([dcm2niixd_folder filesep '*.bval']);
-dbval2=dir([dcm2niixd_folder filesep '*.bvals']);
-dbval=[dbval;dbval2]; %just in case
-%dnii=dir([dcm2niixd_folder filesep '*.nii']); %dnii gets set later and is part of a conditional
-djson=dir([dcm2niixd_folder filesep '*.json']);
-
 %check if they've picked or globbed a file,
 using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
 using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
