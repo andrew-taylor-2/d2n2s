@@ -82,6 +82,9 @@ using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
 
 %DETERMINE input type
 %determine if first-position input is folder, file, or dir object
+% if it's a dir object, make it into file or folder. if it's a file, put it
+% into pick. if it's a folder, move it along as dcm2niixd_folder, to be
+% used later as pp
 
 % guessing dir will be easiest to tell or rule out
 intype='';
@@ -89,10 +92,25 @@ if ~using_pick && ~using_glob
     
     % guessing DIR will be easiest to tell or rule out -- do that first
     if isstruct(dcm2niixd_folder) && isfield(dcm2niixd_folder,'name') && isfield(dcm2niixd_folder,'folder')
-        intype='dirobj';
-        flags.pick=fnify2(dcm2niixd_folder);
-        using_pick=true;
+%         intype='dirobj';
         
+        %we don't want to leave our input as a dir object, we want to
+        %direct it into the file or folder stream. 
+        
+        temp=fnify2(dcm2niixd_folder);
+        if exist(temp,'dir')
+            intype='dir';
+            dcm2niixd_folder=temp;
+            
+        elseif exist(temp,'file')
+            intype='file';
+            flags.pick=temp;
+            using_pick=true;
+            
+        else
+            error('your dir input isn''t a file or folder! might not exist')
+        end
+                
         
     %next try FILEname -- dir handling will be doing nothing as the rest of
     %the program already does dir handling
@@ -100,9 +118,10 @@ if ~using_pick && ~using_glob
         intype='file';
         flags.pick=dcm2niixd_folder;
         using_pick=true;
+    else
+        intype='dir';
     end
 end
-intype='dir';
 
 
 
