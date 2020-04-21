@@ -1,4 +1,4 @@
-function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
+function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,varargin)
 %target object seg should be a dwi object with one element
 % operates on "objects" (structures)
 
@@ -42,13 +42,15 @@ function [new_source,M]=coregister_obj(target_object_seg,source_obj_seg,flags)
 
 if length(target_object_seg)>1; error('unintended usage');end
 
-if ~exist('flags','var') || ~isfield(flags,'apply')
-    flags.apply=2;
-end
+flags=make_flags('coregister',varargin{:});
 
-if ~exist('flags','var') || ~isfield(flags,'stringent')
-    flags.stringent=0;
-end
+% if ~exist('flags','var') || ~isfield(flags,'apply')
+%     flags.apply=2;
+% end
+% 
+% if ~exist('flags','var') || ~isfield(flags,'stringent')
+%     flags.stringent=0;
+% end
 
 % coregistration and reslicing parameters
 

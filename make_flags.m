@@ -30,7 +30,7 @@ elseif strcmpi(read_write_str,'write')
     addParameter(p,'nfn',0,@(x) isequal(x,1) || isequal(x,0) )
     addParameter(p,'del',0,@(x) isequal(x,1) || isequal(x,0) )
     
-elseif strcmpi(read_write_str,'coregister')
+elseif strcmpi(read_write_str,'coregister') || strcmpi(read_write_str,'coreg')
     
     addParameter(p,'no0',0, @(x) isequal(x,1) || isequal(x,0) )
     addParameter(p,'animal',0, @(x) isequal(x,1) || isequal(x,0) )

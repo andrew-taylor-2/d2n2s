@@ -1,4 +1,4 @@
-function out_fn=d2n2s_write(dwi,folder,name,flags)
+function out_fn=d2n2s_write(dwi,folder,name,varargin)
 %take matlab dwi object and write it to file
 % input is "object" (structure created by d2n2s), output is files
 %from andrew's OOP scripts
@@ -23,9 +23,12 @@ function out_fn=d2n2s_write(dwi,folder,name,flags)
 % fail. just replace '~' with your home directory
 
 %% handle inputs
-if ~exist('flags','var')
-    flags=[];
-end
+flags=make_flags('write',varargin{:});
+
+% 
+% if ~exist('flags','var')
+%     flags=[];
+% end
 
 if ~exist(folder,'dir')
     try

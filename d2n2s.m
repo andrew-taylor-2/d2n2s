@@ -1,4 +1,4 @@
-function dwi=d2n2s(dcm2niixd_folder,flags)
+function dwi=d2n2s(dcm2niixd_folder,varargin)
 % operates on files/folders
 %
 
@@ -35,9 +35,12 @@ function dwi=d2n2s(dcm2niixd_folder,flags)
 %% random input sanitizing
 % I SHOULD STICK FLAGS INTO make_flags() TO SANITIZE IT
 
-if ~exist('flags','var')
-    flags=[];
-end
+%new line that should make things way more convenient...
+flags=make_flags('read',varargin{:});
+
+% if ~exist('flags','var')
+%     flags=[];
+% end
 
 
 if isstring(dcm2niixd_folder)
