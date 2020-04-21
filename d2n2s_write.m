@@ -178,6 +178,7 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
         end
     end
 end
+%I should change this to make it a cell if vol==3
 out_fn=fn;
 %% json file
 if isfield(dwi,'json')
