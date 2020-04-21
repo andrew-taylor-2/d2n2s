@@ -142,7 +142,7 @@ if using_pick || using_glob
     end
     
     %nn might contain
-    if strcmp(nn(end-3:end),'.nii')
+    if (length(nn)>4) && strcmp(nn(end-3:end),'.nii')
         nn=nn(1:end-4);
     end
     
@@ -163,13 +163,14 @@ if using_pick || using_glob
     
     %yes, the logic flow is weird and gross looking. if only there were an
     %"if,else,finally"?
- 
+    
+    %check gz, if so set gz to 1
+    if contains(ee,'gz','IgnoreCase',true)
+        flags.gz=1;
+    end
+    
 end
-   
-%check gz, if so set gz to 1
-if contains(ee,'gz','IgnoreCase',true)
-    flags.gz=1;
-end
+
 
 
 %the next section was one of the first sections, the values got replaced
