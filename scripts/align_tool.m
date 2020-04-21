@@ -2,8 +2,11 @@ function [new_source,shift,trg_CoM]=align_tool(target_object_seg,source_object_s
 %BIG NOTE: RIGHT NOW, THIS IS ONLY INTENDED TO BE USED ON images with the
 %same dimensions (eg two instances of the same sequence)
 
+%right now, flags.flip does nothing, images are flipped anyway. To use it
+%another way probably wouldn't work in most cases.
+
 %target object seg should be a dwi object with one element. 
-if length(target_object_seg)>1; error('unintended usage');end
+if length(target_object_seg)>1; error('unintended usage, target object should be length 1');end
 
 if ~exist('flags','var')
     flags=[];
