@@ -1,6 +1,9 @@
 
 function oldNormSub2(src, tar, smoref, reg, interp,prefix)
 %coregister T2 to match T1 image, apply to lesion
+
+%the majority of this is from a function in Chris Rorden's nii_preprocess repository
+
 if isempty(src) || isempty(tar), return; end;
 if ~exist('smoref','var'), smoref = 0; end;
 if ~exist('reg','var'), reg = 1; end;

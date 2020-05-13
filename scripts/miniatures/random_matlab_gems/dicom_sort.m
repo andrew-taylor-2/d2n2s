@@ -1,6 +1,8 @@
 function dicom_sort(fn_o)
 %base_folder = uigetdir('', 'Input folder:');
 
+%some of these lines (and the inspiration) were written by Russell Glenn
+
 subject_folder = fn_o;
 
 % move all files
