@@ -7,5 +7,5 @@ flip_mat(ind)=-1;
 in_obj_flipped=in_obj;
 in_obj_flipped.hdr.mat=flip_mat*in_obj_flipped.hdr.mat;
 
-out_obj=coregister_obj(in_obj,in_obj_flipped,make_flags('coregister','apply',-1))
+out_obj=coregister_obj(in_obj,in_obj_flipped,make_flags('coregister','apply',-1));
 end
