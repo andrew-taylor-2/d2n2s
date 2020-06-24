@@ -358,7 +358,7 @@ if ~isempty(nii_file)
             % ASSIGNMENT TO STRUCT
             [dwi.img]=img2{:};
             
-            if numel(dwi(1).hdr.pinfo)>=2 && ~all(dwi(1).hdr.pinfo(1:2)~=[1 0])
+            if numel(dwi(1).hdr.pinfo)>=2 && any(dwi(1).hdr.pinfo(1:2)~=[1;0])
                 warning('the .hdr.pinfo field indicates that the "true" voxel values might be different from the raw values stored (e.g. the values might be scaled). One consequence of this is that values written to the image (after using d2n2s_write or spm_write_vol) may be only approximations of those that were assigned.')
             end
             
