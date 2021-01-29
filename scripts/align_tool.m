@@ -21,9 +21,14 @@ if ~isfield(flags,'flip')
     flags.flip=0;
 end
 
-%ensure correct usage
-assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
+if ~isfield(flags,'taketarg')
+    flags.taketarg=1;
+end
 
+%ensure correct usage
+if flags.taketarg
+assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
+end
 
 %% do flips if user wants to
 
@@ -32,27 +37,35 @@ assert(all(target_object_seg.hdr.dim == source_object_seg(1).hdr.dim))
 
 % this code was just added from shih_coreg_thursday (...) 
 
-mat_flip=eye(4);
-if target_object_seg(1).hdr.mat(1)*source_object_seg(1).hdr.mat(1)<0
-    %flip
-    for i=1:length(source_object_seg)
-        source_object_seg(i).img=flip(source_object_seg(i).img,1);
-%         mat_flip(1)=-1;
+
+%checking on this way later: why is mat_flip's code commented out? Does
+%this work for every combination of options? 
+
+if flags.flip
+    
+    mat_flip=eye(4);
+    if target_object_seg(1).hdr.mat(1)*source_object_seg(1).hdr.mat(1)<-0.2 % I changed these inequalities from 0 bc I have an image that has the same orientations and this product is giving me a small negative number. .25exects a minimum normal M(1,1) to be -.5
+        %flip
+        for i=1:length(source_object_seg)
+            source_object_seg(i).img=flip(source_object_seg(i).img,1);
+            %         mat_flip(1)=-1;
+        end
     end
-end
-if target_object_seg(1).hdr.mat(6)*source_object_seg(1).hdr.mat(6)<0
-    %flip
-    for i=1:length(source_object_seg)
-        source_object_seg(i).img=flip(source_object_seg(i).img,2);
-%         mat_flip(6)=-1;
+    if target_object_seg(1).hdr.mat(6)*source_object_seg(1).hdr.mat(6)<-0.2
+        %flip
+        for i=1:length(source_object_seg)
+            source_object_seg(i).img=flip(source_object_seg(i).img,2);
+            %         mat_flip(6)=-1;
+        end
     end
-end
-if target_object_seg(1).hdr.mat(11)*source_object_seg(1).hdr.mat(11)<0
-    %flip
-    for i=1:length(source_object_seg)
-        source_object_seg(i).img=flip(source_object_seg(i).img,3);
-%         mat_flip(11)=-1;
+    if target_object_seg(1).hdr.mat(11)*source_object_seg(1).hdr.mat(11)<-0.2
+        %flip
+        for i=1:length(source_object_seg)
+            source_object_seg(i).img=flip(source_object_seg(i).img,3);
+            %         mat_flip(11)=-1;
+        end
     end
+    
 end
 
 %
@@ -74,16 +87,41 @@ if flags.com
     shift=spm_matrix(src_shift);
 end
 
-trg_space=target_object_seg.hdr.mat;
-for j = 1:length(source_object_seg)
-    %next line causes (in spm_reslice) source voxels to shift, then source
-    %hdr.mat to be set to target
-    source_object_seg(j).hdr.mat=shift*trg_space;
+
+
+
+
+if flags.taketarg %if you want source to adopt target's orient info
     
-    %set the others to the same
-    source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
-    source_object_seg(j).hdr.private.mat0=source_object_seg(j).hdr.mat;
+    trg_space=target_object_seg.hdr.mat;
+    for j = 1:length(source_object_seg)
+        %next line causes (in spm_reslice) source voxels to shift, then source
+        %hdr.mat to be set to target
+        source_object_seg(j).hdr.mat=trg_space*shift; %RECENT CHANGE: order of trg_space, shift changed. Shift applies to voxels so it should be applied before the rest
+        
+        %set the others to the same
+        source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
+        source_object_seg(j).hdr.private.mat0=source_object_seg(j).hdr.mat;
+    end
+    
+else %if you want source to keep it's orient info. CoM alignment will still work
+    
+    for j = 1:length(source_object_seg)
+        %next line causes (in spm_reslice) source voxels to shift, then source
+        %hdr.mat to be set to target
+        source_object_seg(j).hdr.mat=source_object_seg(j).hdr.mat*shift;
+        
+        %set the others to the same
+        source_object_seg(j).hdr.private.mat=source_object_seg(j).hdr.mat;
+        source_object_seg(j).hdr.private.mat0=source_object_seg(j).hdr.mat;
+    end
+    
 end
+
+
+
+
+
 
 big_obj=join_obj(target_object_seg,source_object_seg);
 if flags.reslice % you don't need to reslice if you're not moving anything
