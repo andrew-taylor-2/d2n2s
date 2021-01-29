@@ -41,6 +41,10 @@ if ~isfield(flags,'del') || isempty(flags.del)
     flags.del=0;
 end
 
+%strip nii if necessary
+if contains(name,'.nii') && strcmp(name(end-3:end),'.nii')
+    name=name(1:end-4);
+end
 %% bvals
 if isfield(dwi,'bval') && ~isempty([dwi.bval])
     bvalw=[dwi(:).bval];
