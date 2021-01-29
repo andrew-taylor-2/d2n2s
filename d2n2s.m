@@ -15,7 +15,9 @@ function dwi=d2n2s(dcm2niixd_folder,varargin)
 %flags.no  - tells the program not to read certain things. could be used to
 %speedup if you don't need that info. could be used to avoid errors an
 %incorrect data loading. takes a single string that should contain 'bvec',
-%'bval', 'img','nii', or 'json'
+%'bval', 'img','nii', or 'json'. 'img' avoids loading the voxel data, 'nii'
+%avoids loading the header and voxel data. For example: flags.no='bvecbvalnii' if
+%all you want is json info
 
 %flags.b0 - should we assume that folders not containing bvecs/bvals are
 %b0s? default NO (I no longer use mostly diffusion images lel), but this could be changed by the contents of a json
@@ -314,6 +316,7 @@ end
 nii_file=fnify2(dnii);
 if ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1
     do=get_anonymous_functions;
+    niigz_file=nii_file;
     nii_file=do.gunzip_and_rename_no_delete(nii_file);
     nii_file=do.move_and_rename(nii_file,[tempdir choose_output(@() fileparts(nii_file),2) dicomuid '.nii']);
 end
@@ -354,6 +357,11 @@ if ~isempty(nii_file)
             
             % ASSIGNMENT TO STRUCT
             [dwi.img]=img2{:};
+            
+            if numel(dwi(1).hdr.pinfo)>=2 && any(dwi(1).hdr.pinfo(1:2)~=[1;0])
+                warning('the .hdr.pinfo field indicates that the "true" voxel values might be different from the raw values stored (e.g. the values might be scaled). One consequence of this is that values written to the image (after using d2n2s_write or spm_write_vol) may be only approximations of those that were assigned.')
+            end
+            
         end
         
         %this function is kind of obsolete
@@ -439,6 +447,18 @@ try
     end
 catch
     warning('failed assigning nii fns, continuing')
+end
+
+%assign niigz if you have gone through the gz pipeline -- it's nice to have
+%a path to the original data
+if exist('niigz_file','var')
+try
+    for i=1:length(dwi)
+        dwi(i).fns.niigz=niigz_file;
+    end
+catch
+    warning('failed assigning niigz fns, continuing')
+end
 end
 
 if ~contains(flags.no,'fn','IgnoreCase',1)

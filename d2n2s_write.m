@@ -30,7 +30,7 @@ flags=make_flags('write',varargin{:});
 %     flags=[];
 % end
 
-if ~exist(folder,'dir')
+if ~isempty(folder) && ~exist(folder,'dir')
     try
         mkdir(folder)
     catch
