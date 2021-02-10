@@ -175,18 +175,44 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
         
         if flags.nfn==1
             for i2=1:length(dwi)
-                fn=fullfile(folder,[name sprintf('_%05d.nii',i2)]); %the volumes are programmatically named, similar to how
+                
+                %get the most succinct name
+                if length(dwi)>=100
+                    formstring='03';
+                elseif length(dwi)>=10
+                    formstring='02';
+                else
+                    formstring='01';
+                end
+                
+                
+                fn=fullfile(folder,[name sprintf(['_%' formstring 'd.nii'],i2)]); %the volumes are programmatically named, similar to how
                 %spm_split_file would name them
                 dwi(i2).hdr.fname=fn;
                 dwi(i2).hdr.n=[1,1];
                 
-                spm_write_vol(dwi(i2).hdr,dwi(i2).img)
+                spm_write_vol(dwi(i2).hdr,dwi(i2).img);
             end
         end
     end
 end
-%I should change this to make it a cell if vol==3
-out_fn=fn;
+
+%make the output
+if flags.vol==3
+%     namescell=arrayfun(@(x) x.hdr.fname,dwi,'un',0);
+%     for i=1:numel(namescell{1}) %assume they're all the same length bc that isss how it works
+%         temp=cellfun(@(x) x(i),namescell,'un',0);
+%         samemask(1,i)=isequal(temp{:});
+%     end
+%     out_fn=
+
+%that was the beginning of my solution to the "make a pattern from the
+%filenames and assign as output" problem, but then I remembered I've
+%already done this before
+    out_fn=make_a_pattern(arrayfun(@(x) x.hdr.fname,dwi,'un',0));    
+else
+    out_fn=fn;
+end
 %% json file
 if isfield(dwi,'json')
     empty_jsons=arrayfun(@(x) isempty(x.json),dwi);
@@ -201,4 +227,34 @@ if isfield(dwi,'json')
         fprintf(fid,'%s',jsontext);
         fclose(fid);
     end
+end
+end
+
+function the_pattern=make_a_pattern(patterned_cellstr)
+%makes a pattern by matching characters forward into the string until a
+%divergence, then backward, then joins the two with an asterisk.
+%
+%takes in a cell array of strings
+
+%takes about 0.002 seconds for numel(patterned_cellstr)==10 and time increases
+%linearly with its length and with the length of the beginning and ending
+%strings
+
+max_identicality_index=-1; %start 1 away from lowest possible ("doesn't end up indexing anything") bc it gets incremented once irrespective of the data
+samee=true;
+while samee==true 
+    max_identicality_index=max_identicality_index+1;
+    letters=cellfun(@(x) x(max_identicality_index+1),patterned_cellstr,'un',0);
+    samee=all(isequal(letters{:}));
+end
+    
+min_identicality_index=2; %start 1 away from highest possible ("doesn't end up indexing anything") bc it gets incremented once irrespective of the data
+samee=true;
+while samee==true 
+    min_identicality_index=min_identicality_index-1;
+    letters=cellfun(@(x) x(numel(x)+min_identicality_index-1),patterned_cellstr,'un',0);
+    samee=all(isequal(letters{:}));
+end
+
+the_pattern=[patterned_cellstr{1}(1:max_identicality_index) '*' patterned_cellstr{1}(end+min_identicality_index:end)];
 end
