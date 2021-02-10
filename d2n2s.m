@@ -317,7 +317,7 @@ nii_file=fnify2(dnii);
 if ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1
     do=get_anonymous_functions;
     niigz_file=nii_file;
-    nii_file=do.gunzip_and_rename_no_delete(nii_file);
+    nii_file=do.gunzip_and_rename_no_delete(nii_file); %this shouldn't gunzip in place -- some folders, like the $FSLDIR/data/standard folder, are not writable. 
     nii_file=do.move_and_rename(nii_file,[tempdir choose_output(@() fileparts(nii_file),2) dicomuid '.nii']);
 end
     
