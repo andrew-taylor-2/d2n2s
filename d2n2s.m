@@ -314,11 +314,17 @@ elseif using_glob
 end
 
 nii_file=fnify2(dnii);
-if ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1
+if ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1 && ~contains(nii_file,getenv('FSLDIR'))
     do=get_anonymous_functions;
     niigz_file=nii_file;
     nii_file=do.gunzip_and_rename_no_delete(nii_file);
     nii_file=do.move_and_rename(nii_file,[tempdir choose_output(@() fileparts(nii_file),2) dicomuid '.nii']);
+    
+elseif ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1 && contains(nii_file,getenv('FSLDIR'))
+    do=get_anonymous_functions;
+    niigz_file=nii_file;
+    nii_file=do.copy_and_rename(nii_file,[tempdir choose_output(@() fileparts(nii_file),2) dicomuid '.nii.gz'])
+    nii_file=do.gunzip_and_rename(nii_file);
 end
     
     
