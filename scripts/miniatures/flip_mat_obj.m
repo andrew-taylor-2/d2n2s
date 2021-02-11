@@ -1,7 +1,5 @@
 function [out_obj,flip_mat]=flip_mat_obj(in_obj,dim)
-%if you have off diagonal values, this might not work (But it does if
-%you're in MNI space). What I really should do is use spm_imatrix, then
-%flip the scaling factor. 
+% good function
 
 flip_mat=eye(4); %start with identity matrix
 if dim==1, ind=1; elseif dim==2, ind=6; elseif dim==3, ind=11; else, error;end %change sign of one of the diagonal elements
