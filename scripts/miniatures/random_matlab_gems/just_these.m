@@ -1,9 +1,10 @@
-function filtered_obj=just_these(input_img_object,indices_to_keep)
+function filtered_obj=just_these(input_img_object,indices_to_keep,binarize_bool)
 
 %.img fields are assumed to hold a 3d image
 
-%this doesnt really need the inputs/outs to be objects. I could just give
-%it the .img field and make it more general
+if ~exist('binarize_bool','var')
+    binarize_bool=0;
+end
 
 assert(isvector(indices_to_keep))
 
@@ -12,4 +13,8 @@ for i=1:length(input_img_object)
     good_voxels=logical(sum(good_voxels_4d,4));
     filtered_obj(i)=input_img_object(i);
     filtered_obj(i).img(~good_voxels)=0;
+    
+    if binarize_bool
+        filtered_obj(i).img(good_voxels)=1;
+    end
 end
