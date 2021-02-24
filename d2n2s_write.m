@@ -147,9 +147,9 @@ if isfield(dwi,'hdr') && isfield(dwi,'img')
             
         %% set values and write 4d    
         if flags.del==1
-            %warning('off','MATLAB:DELETE:FileNotFound')
+            warning('off','MATLAB:DELETE:FileNotFound')
             delete(fn)
-            %warning('on','MATLAB:DELETE:FileNotFound')
+            warning('on','MATLAB:DELETE:FileNotFound')
         end
         for i1=1:length(dwi)
             dwi(i1).hdr.fname=fn;
