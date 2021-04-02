@@ -50,6 +50,9 @@ classdef nii_class
             % I need to make the new try <assign .fns field> statements their own
             % function, it's making this function look bloated
             
+            if nargin==0 %matlab wants this....
+                return
+            end
             
             %% random input sanitizing
             % I SHOULD STICK FLAGS INTO make_flags() TO SANITIZE IT
