@@ -171,17 +171,17 @@ classdef nii_class
                     nn=nn(1:end-4);
                 end
                 
-                matching_bvec_name=[pp filesep nn '.bvec'];
+                matching_bvec_name=fullfile(pp,[nn '.bvec']);
                 if exist(matching_bvec_name,'file')
                     dbvec=dir(matching_bvec_name);
                 end
                 
-                matching_bval_name=[pp filesep nn '.bval'];
+                matching_bval_name=fullfile(pp,[nn '.bval']);
                 if exist(matching_bval_name,'file')
                     dbval=dir(matching_bval_name);
                 end
                 
-                matching_json_name=[pp filesep nn '.json'];
+                matching_json_name=fullfile(pp,[nn  '.json']);
                 if exist(matching_json_name,'file')
                     djson=dir(matching_json_name);
                 end
@@ -210,19 +210,19 @@ classdef nii_class
             
             if ~exist('dbvec','var')
                 
-                dbvec=dir([pp filesep '*.bvec']);
-                dbvec2=dir([pp filesep '*.bvecs']);
+                dbvec=dir(fullfile(pp,'*.bvec'));
+                dbvec2=dir(fullfile(pp, '*.bvecs'));
                 dbvec=[dbvec;dbvec2]; %just in case
             end
             
             if ~exist('dbval','var')
-                dbval=dir([pp filesep '*.bval']);
-                dbval2=dir([pp filesep '*.bvals']);
+                dbval=dir(fullfile(pp, '*.bval'));
+                dbval2=dir(fullfile(pp,'*.bvals'));
                 dbval=[dbval;dbval2]; %just in case
             end
             
             if ~exist('djson','var')
-                djson=dir([pp filesep '*.json']);
+                djson=dir(fullfile(pp,'*.json'));
             end
             
             
@@ -315,10 +315,10 @@ classdef nii_class
             % get nifti name with dir or flags.pick
             if ~using_pick && ~using_glob %if the user has not opted to specify the nii fn himself
                 
-                dnii=dir([pp filesep '*.nii']);
+                dnii=dir(fullfile(pp,'*.nii'));
                 
                 if isempty(dnii)
-                    dnii=dir([pp filesep '*.nii.gz']);
+                    dnii=dir(fullfile(pp,'*.nii.gz'));
                     if ~isempty(dnii)
                         warning('couldn''t find a .nii file, but found a .nii.gz -- using')
                         flags.gz=1;
