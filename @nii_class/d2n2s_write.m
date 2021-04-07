@@ -48,8 +48,8 @@ end
 
 %% bvals
 % if isfield(dwi,'bval') && ~isempty([dwi.bval])
-if ~isempty([dwi.bvals])
-    bvalw=[dwi(:).bvals];
+if ~isempty([dwi.bval])
+    bvalw=[dwi(:).bval];
     if numel(bvalw)<numel(dwi);
         warning('you might have some empty bvals; proceeding anyway')
     end
@@ -61,8 +61,8 @@ end
 
 %% bvecs
 % if isfield(dwi,'bvec') && ~isempty([dwi.bvec])
-if ~isempty([dwi.bvecs])
-    bvecs=[dwi(:).bvecs];
+if ~isempty([dwi.bvec])
+    bvecs=[dwi(:).bvec];
     if length(bvecs)<numel(dwi)
         warning('some of your bvecs might be empty; proceeding anyway')
     end

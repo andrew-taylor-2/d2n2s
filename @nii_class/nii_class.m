@@ -5,8 +5,8 @@ classdef nii_class
     properties
         hdr
         img
-        bvals
-        bvecs
+        bval
+        bvec
         json
         fn
         fns
@@ -533,7 +533,7 @@ classdef nii_class
                 % a t1 would get to this point, though, so, if we have the resources, let's see if we can tell
                 % this is a t1 a little better
                 try
-                    if isfield(dwi,'json')
+                    if ~isempty(dwi.json)
                         
                         conds(1)=contains(dwi(1).json.SeriesDescription,'t1','IgnoreCase',1);
                         conds(2)=contains(dwi(1).json.SeriesDescription,'mprage','IgnoreCase',1);
