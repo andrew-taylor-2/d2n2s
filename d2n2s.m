@@ -70,6 +70,8 @@ end
 %these next two have to be initialized
 if ~isfield(flags,'no') || isempty(flags.no) 
     flags.no='';
+elseif contains(flags.no,'meta')
+    flags.no='bvalbvecjson';    
 end
 
 if ~isfield(flags,'b0') || isempty(flags.b0) 
