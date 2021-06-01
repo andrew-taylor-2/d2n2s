@@ -1,15 +1,15 @@
-function dwi=d2n2s(dcm2niixd_folder,varargin)
+function dwi=d2n2s(nifti_files,varargin)
 % operates on files/folders
-%
 
-%flags.pick - if this is specified, this nii filename will be chosen to have it's
-%header/image information loaded. just in case, for instance, one has
-%many nii files within their dcm2niixd_folder
+% Loads nifti data into matlab. first position input should be a
+% .nii/.nii.gz file OR a folder that contains a .nii/.nii.gz with
+% .bval,.bvec, and/or .json files OR a 1 element dir() object with aforementioned
+% file or folder. 
 
-%flags.glob - like flags.pick, but the string will be entered into dir and
+%flags.glob -  the string will be entered into dir and
 %then fnify2 to pick the file. NOTE that while that while "pick"ing a .nii,
 %users will enter the full path fn, users will "glob" only the name and
-%extension of a file within the dcm2niixd_folder. The treatment of these
+%extension of a file within the nifti_files. The treatment of these
 %two fields will hopefully be made more consistent in future updates.
 
 %flags.no  - tells the program not to read certain things. could be used to
@@ -45,11 +45,11 @@ flags=make_flags('read',varargin{:});
 % end
 
 
-if isstring(dcm2niixd_folder)
-    dcm2niixd_folder=char(dcm2niixd_folder);
+if isstring(nifti_files)
+    nifti_files=char(nifti_files);
 end
-if strcmp(dcm2niixd_folder(end),filesep) %strcmp for right now works on struct, let's see if that stays in later versions...
-    dcm2niixd_folder=dcm2niixd_folder(1:end-1); %this isn't actually necessary since dir will ignore double separators, but I'm doing this for clarity
+if strcmp(nifti_files(end),filesep) %strcmp for right now works on struct, let's see if that stays in later versions...
+    nifti_files=nifti_files(1:end-1); %this isn't actually necessary since dir will ignore double separators, but I'm doing this for clarity
 end
 
 if isfield(flags,'pick') && ~isempty(flags.pick) && isstring(flags.pick)
@@ -90,7 +90,7 @@ using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
 %DETERMINE input type
 %determine if first-position input is folder, file, or dir object
 % if it's a dir object, make it into file or folder. if it's a file, put it
-% into pick. if it's a folder, move it along as dcm2niixd_folder, to be
+% into pick. if it's a folder, move it along as nifti_files, to be
 % used later as pp
 
 % guessing dir will be easiest to tell or rule out
@@ -98,16 +98,16 @@ intype='';
 if ~using_pick && ~using_glob
     
     % guessing DIR will be easiest to tell or rule out -- do that first
-    if isstruct(dcm2niixd_folder) && isfield(dcm2niixd_folder,'name') && isfield(dcm2niixd_folder,'folder')
+    if isstruct(nifti_files) && isfield(nifti_files,'name') && isfield(nifti_files,'folder')
 %         intype='dirobj';
         
         %we don't want to leave our input as a dir object, we want to
         %direct it into the file or folder stream. 
         
-        temp=fnify2(dcm2niixd_folder);
+        temp=fnify2(nifti_files);
         if exist(temp,'dir')
             intype='dir';
-            dcm2niixd_folder=temp;
+            nifti_files=temp;
             
         elseif exist(temp,'file')
             intype='file';
@@ -121,9 +121,9 @@ if ~using_pick && ~using_glob
         
     %next try FILEname -- dir handling will be doing nothing as the rest of
     %the program already does dir handling
-    elseif exist(dcm2niixd_folder,'file') && ~exist(dcm2niixd_folder,'dir')
+    elseif exist(nifti_files,'file') && ~exist(nifti_files,'dir')
         intype='file';
-        flags.pick=dcm2niixd_folder;
+        flags.pick=nifti_files;
         using_pick=true;
     else
         intype='dir';
@@ -143,7 +143,7 @@ if using_pick || using_glob
     end
     
     if using_glob
-        dir_out=dir(fullfile(dcm2niixd_folder,flags.glob));
+        dir_out=dir(fullfile(nifti_files,flags.glob));
         dir_out_fn=fnify2(dir_out);
         [pp,nn,ee]=fileparts(dir_out_fn);
     end
@@ -183,11 +183,11 @@ end
 %the next section was one of the first sections, the values got replaced
 %later. I'm moving it later, but not assigning values if they already exist
 
-%in earlier versions, "pp" was dcm2niixd_folder. This was easily replacable
+%in earlier versions, "pp" was nifti_files. This was easily replacable
 %as long as i handled the case where we didn't pick or glob i.e. folder
 %input 
 if strcmp(intype,'dir')
-    pp=dcm2niixd_folder;
+    pp=nifti_files;
 end
 
 if ~exist('dbvec','var')
@@ -554,7 +554,7 @@ if ~isequal(flags.b0,0) && exist('dwi','var') && isempty(dbvec) && isempty(dbval
     % warnings -- code could be made prettier or cooler but I think it
     % would mean slowing down and/or making the warning message harder to
     % read
-    if contains(dcm2niixd_folder,'b0','IgnoreCase',1)
+    if contains(nifti_files,'b0','IgnoreCase',1)
         warning_prefix=['there are no bvals or bvecs, and the folder you''ve given this program contains the string ''b0''' newline];
     else
         warning_prefix=['there are no bvals or bvecs' newline 'ALSO the folder you have supplied doesn''t have ''b0'' in the name. Still,' newline];
