@@ -698,4 +698,22 @@ o=1;
 f();
 end
 end
+
+%adding this as subfunction so d2n2s doesn't depend on my other repo
+%structural_quant which is currently private anyway
+function out=mgz2nii(fn,to_nii)
+
+%default to .nii.gz
+if ~exist('to_nii','var')
+    to_nii=0;
+end
+
+if to_nii
+    out=strrep(fn,'.mgz','.nii');
+else
+    out=strrep(fn,'.mgz','.nii.gz');
+end
+
+systemSub(['mri_convert ' fn ' ' out])
+
 end
