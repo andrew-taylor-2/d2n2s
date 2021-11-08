@@ -345,7 +345,7 @@ elseif ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1 &&
 elseif ~isempty(nii_file) && strcmp('.mgz',nii_file(end-3:end)) && flags.mgz==1 
     %convert and reassign
     mgz_file=nii_file;
-    nii_file=mgz2nii(mgz_file);
+    nii_file=mgz2nii(mgz_file,1);
 end
     
     
