@@ -83,6 +83,10 @@ if ~isfield(flags,'gz') || isempty(flags.gz)
 end
 
 
+if ~isfield(flags,'mgz') || isempty(flags.mgz) 
+    flags.mgz=0;
+end
+
 %check if they've picked or globbed a file,
 using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
 using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
@@ -174,6 +178,10 @@ if using_pick || using_glob
     %check gz, if so set gz to 1
     if strcmpi(ee,'.gz')
         flags.gz=1;
+    end
+    
+    if strcmpi(ee,'.mgz')
+        flags.mgz=1;
     end
     
 end
@@ -304,6 +312,12 @@ if ~using_pick && ~using_glob %if the user has not opted to specify the nii fn h
         if ~isempty(dnii)
             warning('couldn''t find a .nii file, but found a .nii.gz -- using')
             flags.gz=1;
+        elseif isempty(dnii)
+            dnii=dir([pp filesep '*.mgz']);
+            if ~isempty(dnii)
+                warning('couldn''t find a .nii or .nii.gz file, but found a .mgz -- using')
+                flags.mgz=1;
+            end
         end
     end
     
@@ -327,6 +341,11 @@ elseif ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1 &&
     niigz_file=nii_file;
     nii_file=do.copy_and_rename(nii_file,[tempdir choose_output(@() fileparts(nii_file),2) dicomuid '.nii.gz'])
     nii_file=do.gunzip_and_rename(nii_file);
+    
+elseif ~isempty(nii_file) && strcmp('.mgz',nii_file(end-3:end)) && flags.mgz==1 
+    %convert and reassign
+    mgz_file=nii_file;
+    nii_file=mgz2nii(mgz_file);
 end
     
     
@@ -463,6 +482,17 @@ if exist('niigz_file','var')
 try
     for i=1:length(dwi)
         dwi(i).fns.niigz=niigz_file;
+    end
+catch
+    warning('failed assigning niigz fns, continuing')
+end
+end
+
+%assign mgz if you have gone through that path
+if exist('mgz_file','var')
+try
+    for i=1:length(dwi)
+        dwi(i).fns.mgz=mgz_file;
     end
 catch
     warning('failed assigning niigz fns, continuing')
