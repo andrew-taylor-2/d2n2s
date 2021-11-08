@@ -345,7 +345,7 @@ elseif ~isempty(nii_file) && strcmp('.gz',nii_file(end-2:end)) && flags.gz==1 &&
 elseif ~isempty(nii_file) && strcmp('.mgz',nii_file(end-3:end)) && flags.mgz==1 
     %convert and reassign
     mgz_file=nii_file;
-    nii_file=mgz2nii(mgz_file,1);
+    nii_file=mgz2nii(mgz_file,1,1);
 end
     
     
@@ -665,6 +665,33 @@ function val=readJson(fname)
     val = jsondecode(str);
 end
 
+
+%adding this as subfunction so d2n2s doesn't depend on my other repo
+%structural_quant which is currently private anyway
+function out=mgz2nii(fn,to_nii,in_temp)
+do=get_anonymous_functions;
+%default to .nii.gz
+if ~exist('to_nii','var')
+    to_nii=0;
+end
+
+if ~exist('in_temp','var')
+    in_temp=0;
+end
+
+if to_nii
+    out=strrep(fn,'.mgz','.nii');
+else
+    out=strrep(fn,'.mgz','.nii.gz');
+end
+
+if in_temp %this is intended to make the outputfile in the temp dir, either nii or .nii.gz as specified by to_nii. dicomuid has to come first on this one just so in case of .nii.gz the .nii and the .gz don't get split. if i wanted this pristine i could just use spm_fileparts()
+    out=do.move_and_rename(out,[tempdir dicomuid choose_output(@() fileparts(out),2) choose_output(@() fileparts(out),3)]);
+end
+
+systemSub(['mri_convert ' fn ' ' out])
+end
+
 function do = get_anonymous_functions
 
 %inline conditional
@@ -698,22 +725,5 @@ o=1;
 f();
 end
 end
-
-%adding this as subfunction so d2n2s doesn't depend on my other repo
-%structural_quant which is currently private anyway
-function out=mgz2nii(fn,to_nii)
-
-%default to .nii.gz
-if ~exist('to_nii','var')
-    to_nii=0;
-end
-
-if to_nii
-    out=strrep(fn,'.mgz','.nii');
-else
-    out=strrep(fn,'.mgz','.nii.gz');
-end
-
-systemSub(['mri_convert ' fn ' ' out])
 
 end
