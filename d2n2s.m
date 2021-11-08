@@ -172,7 +172,7 @@ if using_pick || using_glob
     %"if,else,finally"?
     
     %check gz, if so set gz to 1
-    if contains(ee,'gz','IgnoreCase',true)
+    if strcmpi(ee,'.gz')
         flags.gz=1;
     end
     
