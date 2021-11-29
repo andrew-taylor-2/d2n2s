@@ -26,7 +26,9 @@ do.gunzip_and_rename=@(in) iif( ~ischar(in) || numel(in)<4,  @() do.curly({in, w
 do.gunzip_and_rename_no_delete=@(in) iif( ~ischar(in) || numel(in)<4,  @() do.curly({in, warning('invalid gunzip input,returning in unchanged')},1), ... %warning for invalid inputs
                                 strcmp(in(end-2:end),'.gz'), @() do.curly({gunzip(in),in(1:end-3)},2), ... % if it's named ".gz", gunzip and return out name
                                 true,                        @() in); % if it's not just return the in name
-
+do.gzip_and_rename=@(in) iif( ~ischar(in) || numel(in)<4,  @() do.curly({in, warning('invalid gunzip input,returning in unchanged')},1), ... %warning for invalid inputs
+                                ~strcmp(in(end-2:end),'.gz'), @() do.curly({gzip(in),void(@() delete(in)),[in '.gz']},3), ... % if it's named ".gz", gunzip and return out name
+                                true,                        @() in); % if it's already a gz just return the in name
 function o=void(f)
 o=1;
 f();
