@@ -21,6 +21,7 @@ if strcmpi(read_write_str,'read')
     addParameter(p,'b0',0,@(x) isnumeric(x) && sum(x==[0 1])==1 ) %prolly slower alt check: @(x) isnumeric(x) && sum(x==[0 1])==1 
     addParameter(p,'gz',0,@(x) isnumeric(x) && sum(x==[0 1])==1 )
     addParameter(p,'no','',@(x) ischar(x)||isstring(x) )
+    addParameter(p,'only_matching_meta',0,@(x) isnumeric(x) && sum(x==[0 1])==1 )
 
 elseif strcmpi(read_write_str,'write')
     

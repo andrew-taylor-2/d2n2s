@@ -87,6 +87,13 @@ if ~isfield(flags,'mgz') || isempty(flags.mgz)
     flags.mgz=0;
 end
 
+%option to grab metadata files based on matching fns with nii in the case
+%of pick
+
+if ~isfield(flags,'only_matching_meta') || isempty(flags.only_matching_meta) 
+    flags.only_matching_meta=0;
+end
+
 %check if they've picked or globbed a file,
 using_pick=(isfield(flags,'pick') && ~isempty(flags.pick));
 using_glob=(isfield(flags,'glob') && ~isempty(flags.glob));
@@ -194,27 +201,49 @@ end
 %in earlier versions, "pp" was nifti_files. This was easily replacable
 %as long as i handled the case where we didn't pick or glob i.e. folder
 %input 
-if strcmp(intype,'dir')
-    pp=nifti_files;
-end
 
-if ~exist('dbvec','var')
+if ~flags.only_matching_meta %new addition
+    if strcmp(intype,'dir')
+        pp=nifti_files;
+    end
     
-    dbvec=dir([pp filesep '*.bvec']);
-    dbvec2=dir([pp filesep '*.bvecs']);
-    dbvec=[dbvec;dbvec2]; %just in case
+    if ~exist('dbvec','var')
+        
+        dbvec=dir([pp filesep '*.bvec']);
+        dbvec2=dir([pp filesep '*.bvecs']);
+        dbvec=[dbvec;dbvec2]; %just in case
+    end
+    
+    if ~exist('dbval','var')
+        dbval=dir([pp filesep '*.bval']);
+        dbval2=dir([pp filesep '*.bvals']);
+        dbval=[dbval;dbval2]; %just in case
+    end
+    
+    if ~exist('djson','var')
+        djson=dir([pp filesep '*.json']);
+    end
+    
+    
+else
+    if strcmp(intype,'dir')
+        pp=nifti_files;
+    end
+    
+    if ~exist('dbvec','var')
+        
+        dbvec=dir(''); %just in case
+    end
+    
+    if ~exist('dbval','var')
+        
+        dbval=dir(''); %just in case
+    end
+    
+    if ~exist('djson','var')
+        djson=dir('');
+    end
 end
-
-if ~exist('dbval','var')
-    dbval=dir([pp filesep '*.bval']);
-    dbval2=dir([pp filesep '*.bvals']);
-    dbval=[dbval;dbval2]; %just in case
-end
-
-if ~exist('djson','var')
-    djson=dir([pp filesep '*.json']);
-end
-
 
 
 
